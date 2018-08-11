@@ -68,15 +68,13 @@
 #define MAJOR 0
 #define MINOR -1
 
-using namespace std;
-
 int positive_modulo(int i, int n);
 
 /* string representations of note and mode ints */
-string c_note_str(int c);
-string s_note_str(int s);
-string s_fps_str(int s, int fps);
-string mode_str(int m);
+std::string c_note_str(int c);
+std::string s_note_str(int s);
+std::string s_fps_str(int s, int fps);
+std::string mode_str(int m);
 
 int thirds_from_six(int sn);
 int add_intv(int base_sn, int base_fps, int intv_sn, int intv_fps, int &res_fps);
@@ -128,7 +126,7 @@ public:
     flatsharp_limit is 7 by default and can be changed with static method
     set_flatsharp_limit. */
     Key(int sn, int fs, int m); // 7-note representation, and mode.
-    Key(string n);        //string representation
+    Key(std::string n);        //string representation
     int get_mode() const;
     /* if update_repr is true, set_mode rechecks the key signature
      * against the flat-sharp limit. */
@@ -136,8 +134,8 @@ public:
     int get_chrom_n() const;
     int get_staff_n() const; // get flats or sharps with get_fps
     int get_fps() const;
-    string disp() const; // just display note name
-    string disp_full() const; // include mode
+    std::string disp() const; // just display note name
+    std::string disp_full() const; // include mode
     /* The maximum flats or sharps before converting to an enharmonic key. By
        default the limit is 7, and it cannot go lower than that number.
        set_flatsharp_limit does not affect Keys which have already been
@@ -186,7 +184,7 @@ public:
     int get_fps() const;
     int get_octave() const;
     Key get_key() const;
-    string disp() const;
+    std::string disp() const;
 private:
     void _chrom_construct();
     int midi_n;
