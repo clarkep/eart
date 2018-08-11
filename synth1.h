@@ -1,9 +1,10 @@
 #ifndef __SYNTH1_H_INCLUDED__
 #define __SYNTH1_H_INCLUDED__
 
+#include "theory.h"
 #include <fluidsynth.h>
 #include <string>
-#include "theory.h"
+#include <vector>
 
 #define SUSTAIN_TIME 5
 #define MAX_CHORD_LENGTH 10
@@ -15,7 +16,7 @@ public:
     NoteSynth();
     ~NoteSynth();
     void play_note(Note n);
-    void play_chord(Note* notes[MAX_CHORD_LENGTH], int len);
+    void play_chord(std::vector<Note> notevec);
 private:
     fluid_settings_t* settings;
     fluid_audio_driver_t* adriver;

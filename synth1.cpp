@@ -1,9 +1,10 @@
+#include "synth1.h"
 #include <fluidsynth.h>
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string>
-#include "synth1.h"
+#include <vector>
 
 using namespace std;
 
@@ -39,16 +40,16 @@ void NoteSynth::play_note(Note n)
     fluid_synth_noteoff(synth, 0, midi_n);
 }
 
-void NoteSynth::play_chord(Note* notes[MAX_CHORD_LENGTH], int len)
+void NoteSynth::play_chord(vector<Note> notevec)
 {
     int midi_n = 0;
-    for (int i = 0; i < len; i++) {
-        midi_n = notes[i]->get_midi_n();
+    for (int i = 0; i < notevec.size(); i++) {
+        midi_n = notevec[i].get_midi_n();
         fluid_synth_noteon(synth, 0, midi_n, 127);
     }
     sleep(SUSTAIN_TIME);
-    for (int i = 0; i < len; i++) {
-        midi_n = notes[i]->get_midi_n();
+    for (int i = 0; i < notevec.size(); i++) {
+        midi_n = notevec[i].get_midi_n();
         fluid_synth_noteoff(synth, 0, midi_n);
     }
 }

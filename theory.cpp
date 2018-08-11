@@ -1,5 +1,5 @@
 /*
- *  Classes to represent musical objects in equal-tempered harmony--
+ *  Classes to represent basic musical objects in equal-tempered harmony-
  *  keys and notes.
  *  Author: Paul Clarke
  *  5/2/18
@@ -20,12 +20,12 @@
  * used to it :).
  */
 
+#include "theory.h"
 #include <iostream>
 #include <string>
 #include <stdexcept>
 #include <stdlib.h>
 #include <cmath>
-#include "theory.h"
 
 using namespace std;
 

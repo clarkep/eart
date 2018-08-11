@@ -1,9 +1,12 @@
+#include "synth1.h"
+#include "theory.h"
+
+#include <vector>
 #include <assert.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <iomanip>
-#include "theory.h"
 
 using namespace std;
 
@@ -501,6 +504,9 @@ int test_note()
 
 int test_misc()
 {
+    NoteSynth synth;
+    vector<Note> v1{Note(C_C, 4)}; //, Note(S_D, -1, 4, Key("G"))};
+    synth.play_chord(v1);
 }
 
 int main(int argc, char** argv)
