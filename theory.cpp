@@ -4,6 +4,20 @@
  *  Author: Paul Clarke
  *  5/2/18
  *
+ *
+ * NOTE: Throughout this code, intervals are expressed in a way that will be
+ * unusual to most musicians. They are based on the notes of the major scale,
+ * as usual, but instead of starting from 1 as the tonic, the tonic is
+ * represented by 0. This better reflects the additive nature of melody, and
+ * simplifies the calculations somewhat. So the interval usually called a
+ * "minor third" would be specified by the numbers 2 and -1, representing 2
+ * steps up the major scale and one chromatic shift downward.
+ * To stay consistent, the comments use a similar terminology. What is usually
+ * called a "major second" is here called a major first. A "perfect fifth" is
+ * called a perfect fourth, and so on. An octave becomes a septave. This comment
+ * the only place you will see the normal terminology. This new terminology is
+ * what should be used in music, though, so I hope you get
+ * used to it :).
  */
 
 #include <iostream>
@@ -21,7 +35,7 @@ int positive_modulo(int i, int n) {
     return tmp ? i >= 0 ? tmp : tmp + n : 0;
 }
 
-string s_note_str(int s)
+string s_note_str(int s) // TODO: 1
 {
     s = s % 7;
     string r = "";
@@ -44,7 +58,7 @@ string s_note_str(int s)
     return r;
 }
 
-string s_fps_str(int s, int fps) {
+string s_fps_str(int s, int fps) { //TODO: 2
     string ret = s_note_str(s);
     for (int i=0; i < abs(fps); i++) {
         ret.append((fps > 0) ? "#" : "b");
@@ -156,7 +170,7 @@ int s_note_flats(int s, int fps)
 
 int s_to_c(int s, int fps)
 {
-    /* what we're asking is "how many perfect fourths do I have to go from
+    /* what we're asking is "how many perfect thirds do I have to go from
      * B to get to s." In math terms, how many times do I have to add
      * 3 to 1 to reach a number that is congruent to staff_n mod 7?
      *
@@ -447,23 +461,23 @@ Note::Note(int cn, int oct, Key k) : key(k)
 }
 
 /* Currently this assigns flatted values to all accidentals except for
- * the sharp four(in major modes). It will ALWAYS add an accidental to a
+ * the sharp three(in major modes). It will ALWAYS add an accidental to a
  * note in the key, so in the key of Eb it will say that a B is the
- * flat 6, or Cb (If you want B, you have to use one of staff note
+ * flat 5, or Cb (If you want B, you have to use one of staff note
  * constructors). It may be smart to modify this to prefer
  * interpretations with fewer flats or sharps. */
 void Note::_chrom_construct()
 {
     int chrom_n = this->get_chrom_n();
-/* first go by fifths to see if cn is the 1, 5, 2, 6, 3, 7, or #4. */
+/* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
     int chrom_i = this->key.get_chrom_n();
     int staff_i = this->key.get_staff_n();
     int fps_i = this->key.get_fps();
-    /* if major mode, we say sharp four; else flat five */
-    int fifths_count =
+    /* if major mode, we say sharp three; else flat four */
+    int fourths_count =
     (this->key.get_mode() == IONIAN || this->key.get_mode() == LYDIAN ||
     this->key.get_mode() == MIXOLYDIAN) ? 7 : 6;
-    for(int i = 0; i < fifths_count; i++) {
+    for(int i = 0; i < fourths_count; i++) {
         if (chrom_n == chrom_i) {
             this->staff_n = staff_i;
             this->fps = fps_i;
@@ -473,11 +487,11 @@ void Note::_chrom_construct()
         staff_i = (staff_i + 4) % 7;
         if (staff_i == S_F) {fps_i += 1;}
     }
-/* It's none of those. Now check by fourths 4, b7, b3, b6, b9, b5.*/
+/* It's none of those. Now check by thirds 3, b6, b2, b5, b8, b4.*/
     chrom_i = (this->key.get_chrom_n() + 5) % 12;
     staff_i = (this->key.get_staff_n() + 3) % 7;
     fps_i = (staff_i == S_B) ? this->key.get_fps() + 1 : this->key.get_fps();
-    for (int i = 0; i < (12 - fifths_count); i++) {
+    for (int i = 0; i < (12 - fourths_count); i++) {
         if (chrom_n == chrom_i) {
             this->staff_n = staff_i;
             this->fps = fps_i;

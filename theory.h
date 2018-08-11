@@ -1,8 +1,23 @@
 /*
  *  Classes to represent musical objects in equal-tempered harmony--
- *  keys, notes, chords, etc.
+ *  keys and notes.
  *  Author: Paul Clarke
  *  5/2/18
+ *
+ *
+ * NOTE: Throughout this code, intervals are expressed in a way that will be
+ * unusual to most musicians. They are based on the notes of the major scale,
+ * as usual, but instead of starting from 1 as the tonic, the tonic is
+ * represented by 0. This better reflects the additive nature of melody, and
+ * simplifies the calculations somewhat. So the interval usually called a
+ * "minor third" would be specified by the numbers 2 and -1, representing 2
+ * steps up the major scale and one chromatic shift downward.
+ * To stay consistent, the comments use a similar terminology. What is usually
+ * called a "major second" is here called a major first. A "perfect fifth" is
+ * called a perfect fourth, and so on. An octave becomes a septave. This comment
+ * is the only place you'll see the normal terminology. This new terminology is
+ * what should have been used from the start in music, though, so I hope you get
+ * used to it :).
  *
  */
 #ifndef __THEORY_H_INCLUDED__
@@ -79,18 +94,6 @@ int s_to_c(int s, int fps);
  * from zero, so 0 is unison, 1, is a major second, 4 is a perfect fifth,
  * 7 is an octave, etc. */
 int sintv_to_cintv(int sintv, int fps);
-
-/*
- * Find the enharmonic of c_note whose given mode has the fewest flats
- * or sharps. Ties go to sharps for lydian(B) and ionian(F#),
- * flats for all others. Returns the staff note number, and sets
- * fps to -1 for flat, 0 for natural, and +1 for sharp on that note.
- *
- * For darker modes, this can have difficult results- for
- * example, in the locrian mode, it will return A#(5 sharps) instead of
- * Bb(7 flats). That's why it's recommended to set Key::modal to
- * false and only use major/minor.
- */
 int resolve_chromatic(int c_note, int mode, int &fps);
 
 /*
@@ -108,7 +111,22 @@ int resolve_chromatic(int c_note, int mode, int &fps);
 class Key
 {
 public:
-    Key(int n, int m); //chromatic(mod 12) representation, and mode.
+     /* Using  the chromatic constructor, Key will find the enharmonic of cn
+     whose given mode has the fewest flats or sharps. Ties go to sharps for
+     lydian(B) and ionian(F#), flats for all others. Returns the staff note
+     number, and sets fps to -1 for flat, 0 for natural, and +1 for sharp on
+     that note.
+
+     For darker modes, this can have difficult results- for
+     example, in the locrian mode, it will return A#(5 sharps) instead of
+     Bb(7 flats). That's why it's recommended to set Key::modal to
+     false and only use major/minor. */
+    Key(int cn, int m); //chromatic(mod 12) representation, and mode.
+
+    /* Using the following constructors, key will use the given representation
+    unless the mode m of the key has more than flatsharp_limit flats or sharps.
+    flatsharp_limit is 7 by default and can be changed with static method
+    set_flatsharp_limit. */
     Key(int sn, int fs, int m); // 7-note representation, and mode.
     Key(string n);        //string representation
     int get_mode() const;
@@ -118,10 +136,18 @@ public:
     int get_chrom_n() const;
     int get_staff_n() const; // get flats or sharps with get_fps
     int get_fps() const;
-    string disp() const; // just note name
+    string disp() const; // just display note name
     string disp_full() const; // include mode
+    /* The maximum flats or sharps before converting to an enharmonic key. by
+       default the limit is 7, and it cannot go lower than that number.
+       set_flatsharp_limit does not affect Keys which have already been
+       initialized. */
     static int get_flatsharp_limit();
     static void set_flatsharp_limit(int lim);
+    /* If modal is set to true, a key can take any of the modes of the major
+       scale. By default, when modal is false, a key can only be MAJOR or
+       MINOR(ie. IONIAN or AEOLIAN). Keys are represented by the macros defined
+       above. */
     static bool get_modal();
     static void set_modal(bool m);
 private:

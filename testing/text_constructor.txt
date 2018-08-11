@@ -2,4 +2,3 @@ B Major
 F# Minor
 G# Minor
 A Minor
-

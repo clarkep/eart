@@ -1,13 +1,28 @@
 #include <assert.h>
 #include <iostream>
 #include <sstream>
-#include <istream>
+#include <fstream>
 #include <iomanip>
 #include "theory.h"
 
 using namespace std;
 
-bool asser_pipe_equal(ostream pipe1, ostream pipe2);
+bool streams_equal(istream *stream1, istream *stream2)
+{
+    string str1, str2;
+    do  {
+        *stream1 >> str1;
+        *stream2 >> str2;
+        if (str1 != str2) {
+            return false;
+        }
+    } while (stream1->good() && stream2->good());
+    if (stream1->good() || stream2->good()) { // one of them has more in the stream...
+        return false;
+    } else {
+        return true;
+    }
+}
 
 /* functions in theory.h */
 int test_tfs() {
@@ -153,38 +168,32 @@ int test_resolve_chromatic()
     return 0;
 }
 
-int test_free_functions()
-{
-    test_tfs();
-    test_add_intv();
-    test_get_intv();
-    test_mode_flats();
-    test_s_note_flats();
-    test_s_to_c();
-    test_resolve_chromatic();
-}
-
 /* tests for the Key class */
 
 int test_key_chrom_constructor() {
+    ostringstream out;
     for (int i = 0; i < 12; i++) {
         Key k(i, MAJOR);
         Key kmin(i, MINOR);
-        cout << left << "Testing " << setw(7) << c_note_str(i) + ": "
+        out << left << "Testing " << setw(7) << c_note_str(i) + ": "
         << setw(10) << left << k.disp_full() << setw(10) << kmin.disp_full() << endl;
     }
     Key::set_modal(true);
     for (int i = 0; i < 12; i++) {
-        cout << left << "Testing " << setw(7) << c_note_str(i) + ": ";
+        out << left << "Testing " << setw(7) << c_note_str(i) + ": ";
         for (int m = 0; m < 7; m++) {
             Key k(i, (3+4*m) % 7);
-            cout << setw(14) << k.disp_full();
+            out << setw(14) << k.disp_full();
         }
-        cout << endl;
+        out << endl;
     }
+    istringstream stream1(out.str());
+    ifstream stream2("testing/chrom_constructor.txt");
+    assert(streams_equal(&stream1, &stream2));
 }
 
 int test_key_staff_constructor() {
+    ostringstream out;
     /* flats */
     Key::set_modal(true);
     Key::set_flatsharp_limit(7);
@@ -195,51 +204,56 @@ int test_key_staff_constructor() {
         if ((s_note % 7) == S_B) {
             fps -= 1;
         }
-        cout << left << "Testing " << setw(7) << s_fps_str(s_note % 7, fps) + ": ";
+        out << left << "Testing " << setw(7) << s_fps_str(s_note % 7, fps) + ": ";
         for (int m = 0; m < 7; m++) {
             Key k(s_note % 7, fps, (3+4*m) % 7);
-            cout << setw(15) << k.disp_full();
+            out << setw(15) << k.disp_full();
         }
-        cout << endl;
+        out << endl;
     }
     /* sharps */
-    cout << endl;
+    out << endl;
     fps = 0;
     for (int i = 0; i < 20; i++) {
         s_note = (S_C - i * 3);
         if (positive_modulo(s_note, 7) == S_F) {
             fps += 1;
         }
-        cout << left << "Testing " << setw(7) << s_fps_str(positive_modulo(s_note, 7), fps) + ": ";
+        out << left << "Testing " << setw(7) << s_fps_str(positive_modulo(s_note, 7), fps) + ": ";
         for (int m = 0; m < 7; m++) {
             Key k(positive_modulo(s_note, 7), fps, (3+4*m) % 7);
-            cout << setw(15) << k.disp_full();
+            out << setw(15) << k.disp_full();
         }
-        cout << endl;
+        out << endl;
     }
+
+    istringstream stream1(out.str());
+    ifstream stream2("testing/staff_constructor.txt");
+    assert (streams_equal(&stream1, &stream2));
+
 }
 
 int test_key_text_constructor() {
+    ostringstream out;
+    Key::set_modal(false);
     Key k("B");
-    cout << k.disp_full() << endl;
+    out << k.disp_full() << endl;
     Key g("Gbm");
-    cout << g.disp_full() << endl;
+    out << g.disp_full() << endl;
     g = Key("G#m");
-    cout << g.disp_full() << endl;
+    out << g.disp_full() << endl;
     g = Key("Cbbbm");
-    cout << g.disp_full() << endl;
+    out << g.disp_full() << endl;
+
+    istringstream stream1(out.str());
+    ifstream stream2("testing/text_constructor.txt");
+    assert (streams_equal(&stream1, &stream2));
+
 }
 
-int test_key_misc() {
-    Key::set_modal(true);
-    Key k("C#m");
-    cout << k.disp_full() << endl;
-    k.set_mode(LYDIAN);
-    cout << k.disp_full() << endl;
-}
-
-int test_key()
+int test_key_misc()
 {
+
 }
 
 /* tests for the note class */
@@ -419,32 +433,83 @@ int test_note_ktranspose()
     assert (m.get_midi_n() == 53);
 }
 
-int test_note()
+int test_free_functions()
 {
-  test_note_chrom_constructor();
-  test_note_staff_constructor();
-  test_note_intv_constructor();
-  test_note_ctranspose();
-  test_note_ktranspose();
+    cout << "----------------------------------------------------------------" << endl;
+    cout << "Testing theory.cpp helper functions" << endl;
+    cout << "----------------------------------------------------------------" << endl << endl;
+    cout << "Testing thirds_from_six...";
+    test_tfs();
+    cout << "passed." << endl;
+    cout << "Testing add_intv...";
+    test_add_intv();
+    cout << "passed." << endl;
+    cout << "Testing get_intv...";
+    test_get_intv();
+    cout << "passed." << endl;
+    cout << "Testing mode_flats...";
+    test_mode_flats();
+    cout << "passed." << endl;
+    cout << "Testing s_note_flats...";
+    test_s_note_flats();
+    cout << "passed." << endl;
+    cout << "Testing s_to_c and sintv_to_cintv...";
+    test_s_to_c();
+    cout << "passed." << endl;
+    cout << "Testing resolve_chromatic...";
+    test_resolve_chromatic();
+    cout << "passed." << endl << endl;
 }
 
+int test_key()
+{
+    cout << "----------------------------------------------------------------" << endl;
+    cout << "Testing Key class methods" << endl;
+    cout << "----------------------------------------------------------------" << endl << endl;
+    cout << "Testing chromatic constructor..." << endl;
+    test_key_chrom_constructor();
+    cout << endl << "Test passed. ";
+    cout << "Testing staff constructor..." << endl;
+    test_key_staff_constructor();
+    cout << endl << "Test passed. ";
+    cout << "Testing text constructor..." << endl;
+    test_key_text_constructor();
+    cout << "Test passed." << endl << endl;
+}
+
+int test_note()
+{
+    cout << "----------------------------------------------------------------" << endl;
+    cout << "Testing Note class methods" << endl;
+    cout << "----------------------------------------------------------------" << endl << endl;
+    cout << "Testing chromatic constructor..." << endl;
+    test_note_chrom_constructor();
+    cout << endl << "Test passed. ";
+    cout << "Testing staff constructor..." << endl;
+    test_note_staff_constructor();
+    cout << endl << "Test passed. ";
+    cout << "Testing interval constructor..." << endl;
+    test_note_intv_constructor();
+    cout << endl << "Test passed. ";
+    cout << "Testing chromatic transpose..." << endl;
+    test_note_ctranspose();
+    cout << endl << "Test passed. ";
+    cout << "Testing key transpose..." << endl;
+    test_note_ktranspose();
+    cout << "Test passed." << endl << endl;
+}
 
 int test_misc()
 {
-    cout << -1/7 << endl;
 }
-
 
 int main(int argc, char** argv)
 {
-    //test_key_misc();
-    //test_key_chrom_constructor();
-    //test_key_staff_constructor();
-    //test_key_text_constructor();
     test_misc();
 
     test_free_functions();
+    test_key();
     test_note();
-    //test_key_misc();
+    cout << "----------------------------------------------------------------" << endl;
     cout << "All tests passed.\n";
 }
