@@ -1,6 +1,3 @@
-Testing A:     A Major   A Minor
-Testing A#/Bb: Bb Major  Bb Minor
-Testing B:     B Major   B Minor
 Testing C:     C Major   C Minor
 Testing C#/Db: Db Major  C# Minor
 Testing D:     D Major   D Minor
@@ -10,9 +7,9 @@ Testing F:     F Major   F Minor
 Testing F#/Gb: F# Major  F# Minor
 Testing G:     G Major   G Minor
 Testing G#/Ab: Ab Major  G# Minor
-Testing A:     A Lydian      A Ionian      A Mixolydian  A Dorian      A Aeolian     A Phrygian    A Locrian
-Testing A#/Bb: Bb Lydian     Bb Ionian     Bb Mixolydian Bb Dorian     Bb Aeolian    Bb Phrygian   A# Locrian
-Testing B:     B Lydian      B Ionian      B Mixolydian  B Dorian      B Aeolian     B Phrygian    B Locrian
+Testing A:     A Major   A Minor
+Testing A#/Bb: Bb Major  Bb Minor
+Testing B:     B Major   B Minor
 Testing C:     C Lydian      C Ionian      C Mixolydian  C Dorian      C Aeolian     C Phrygian    C Locrian
 Testing C#/Db: Db Lydian     Db Ionian     Db Mixolydian C# Dorian     C# Aeolian    C# Phrygian   C# Locrian
 Testing D:     D Lydian      D Ionian      D Mixolydian  D Dorian      D Aeolian     D Phrygian    D Locrian
@@ -22,3 +19,6 @@ Testing F:     F Lydian      F Ionian      F Mixolydian  F Dorian      F Aeolian
 Testing F#/Gb: Gb Lydian     F# Ionian     F# Mixolydian F# Dorian     F# Aeolian    F# Phrygian   F# Locrian
 Testing G:     G Lydian      G Ionian      G Mixolydian  G Dorian      G Aeolian     G Phrygian    G Locrian
 Testing G#/Ab: Ab Lydian     Ab Ionian     Ab Mixolydian Ab Dorian     G# Aeolian    G# Phrygian   G# Locrian
+Testing A:     A Lydian      A Ionian      A Mixolydian  A Dorian      A Aeolian     A Phrygian    A Locrian
+Testing A#/Bb: Bb Lydian     Bb Ionian     Bb Mixolydian Bb Dorian     Bb Aeolian    Bb Phrygian   A# Locrian
+Testing B:     B Lydian      B Ionian      B Mixolydian  B Dorian      B Aeolian     B Phrygian    B Locrian

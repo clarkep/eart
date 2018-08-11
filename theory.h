@@ -29,32 +29,32 @@
 #define MODAL 0
 
 /* seven-note (staff) note numbers */
-#define S_A 0
-#define S_B 1
-#define S_C 2
-#define S_D 3
-#define S_E 4
-#define S_F 5
-#define S_G 6
+#define S_C 0
+#define S_D 1
+#define S_E 2
+#define S_F 3
+#define S_G 4
+#define S_A 5
+#define S_B 6
 
 /* chromatic note numbers */
-#define C_A 0
-#define C_A_SHARP 1
-#define C_B_FLAT 1
-#define C_B 2
-#define C_C 3
-#define C_C_SHARP 4
-#define C_D_FLAT 4
-#define C_D 5
-#define C_D_SHARP 6
-#define C_E_FLAT 6
-#define C_E 7
-#define C_F 8
-#define C_F_SHARP 9
-#define C_G_FLAT 9
-#define C_G 10
-#define C_G_SHARP 11
-#define C_A_FLAT 11
+#define C_C 0
+#define C_C_SHARP 1
+#define C_D_FLAT 1
+#define C_D 2
+#define C_D_SHARP 3
+#define C_E_FLAT 3
+#define C_E 4
+#define C_F 5
+#define C_F_SHARP 6
+#define C_G_FLAT 6
+#define C_G 7
+#define C_G_SHARP 8
+#define C_A_FLAT 8
+#define C_A 9
+#define C_A_SHARP 10
+#define C_B_FLAT 10
+#define C_B 11
 
 /* modes */
 #define IONIAN 0
@@ -138,7 +138,7 @@ public:
     int get_fps() const;
     string disp() const; // just display note name
     string disp_full() const; // include mode
-    /* The maximum flats or sharps before converting to an enharmonic key. by
+    /* The maximum flats or sharps before converting to an enharmonic key. By
        default the limit is 7, and it cannot go lower than that number.
        set_flatsharp_limit does not affect Keys which have already been
        initialized. */

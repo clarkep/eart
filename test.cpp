@@ -187,6 +187,7 @@ int test_key_chrom_constructor() {
         }
         out << endl;
     }
+
     istringstream stream1(out.str());
     ifstream stream2("testing/chrom_constructor.txt");
     assert(streams_equal(&stream1, &stream2));
@@ -248,7 +249,6 @@ int test_key_text_constructor() {
     istringstream stream1(out.str());
     ifstream stream2("testing/text_constructor.txt");
     assert (streams_equal(&stream1, &stream2));
-
 }
 
 int test_key_misc()

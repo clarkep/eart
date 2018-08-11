@@ -1,6 +1,6 @@
 /*
  *  Classes to represent musical objects in equal-tempered harmony--
- *  keys, notes, chords, etc.
+ *  keys and notes.
  *  Author: Paul Clarke
  *  5/2/18
  *
@@ -35,15 +35,11 @@ int positive_modulo(int i, int n) {
     return tmp ? i >= 0 ? tmp : tmp + n : 0;
 }
 
-string s_note_str(int s) // TODO: 1
+string s_note_str(int s)
 {
     s = s % 7;
     string r = "";
     switch (s) {
-        case S_A: r = "A";
-            break;
-        case S_B: r = "B";
-            break;
         case S_C: r = "C";
             break;
         case S_D: r = "D";
@@ -54,11 +50,15 @@ string s_note_str(int s) // TODO: 1
             break;
         case S_G: r = "G";
             break;
+        case S_A: r = "A";
+            break;
+        case S_B: r = "B";
+            break;
     }
     return r;
 }
 
-string s_fps_str(int s, int fps) { //TODO: 2
+string s_fps_str(int s, int fps) {
     string ret = s_note_str(s);
     for (int i=0; i < abs(fps); i++) {
         ret.append((fps > 0) ? "#" : "b");
@@ -70,12 +70,6 @@ string c_note_str(int c) {
     c = c % 12;
     string r = "";
     switch (c) {
-        case C_A: r = "A";
-            break;
-        case C_A_SHARP: r= "A#/Bb";
-            break;
-        case C_B: r = "B";
-            break;
         case C_C: r = "C";
             break;
         case C_C_SHARP: r = "C#/Db";
@@ -93,6 +87,12 @@ string c_note_str(int c) {
         case C_G: r = "G";
             break;
         case C_G_SHARP: r = "G#/Ab";
+            break;
+        case C_A: r = "A";
+            break;
+        case C_A_SHARP: r= "A#/Bb";
+            break;
+        case C_B: r = "B";
             break;
     }
     return r;
@@ -160,27 +160,12 @@ int mode_flats(int mode) {
 
 int s_note_flats(int s, int fps)
 {
-    int octave = 0;
-    while (positive_modulo(s - 1 + octave * 7, 3) != 0) {
-        octave += 1;
-    }
-    int flats_past_b = (s - 1 + octave * 7) / 3;
-    return flats_past_b - 5 + (fps * -7);
+    return thirds_from_six(s) - 5 + (fps * -7);
 }
 
 int s_to_c(int s, int fps)
 {
-    /* what we're asking is "how many perfect thirds do I have to go from
-     * B to get to s." In math terms, how many times do I have to add
-     * 3 to 1 to reach a number that is congruent to staff_n mod 7?
-     *
-     * That number is (s + octave * 7) / 3. */
-    int octave = 0;
-    while (positive_modulo(s + octave * 7 - 1, 3) != 0) {
-        octave += 1;
-    }
-    return
-        positive_modulo(2 + ((s + octave * 7 - 1) / 3) * 5 + fps, 12);
+    return positive_modulo(11 + thirds_from_six(s) * 5 + fps, 12);
 }
 
 int sintv_to_cintv(int sintv, int fps)
@@ -203,7 +188,7 @@ int resolve_chromatic(int c_note, int mode, int &fps)
     while ((c_note + octave * 12) % 5 != 0) {
         octave += 1;
     }
-    int key_flats = ((c_note + octave * 12) / 5) - 3;
+    int key_flats = ((c_note + octave * 12) / 5);
     if (key_flats + m_flats > 6) {
         key_flats -= 12;
     } else if ((key_flats + m_flats == 6) && (m_flats <= 0)) {
@@ -212,7 +197,7 @@ int resolve_chromatic(int c_note, int mode, int &fps)
 
     int ret  = positive_modulo(S_C + key_flats * 3, 7);
     /* reverse: positive for sharps, negative for flats */
-    fps = (key_flats >= 0 ? -1 : 1) * ((abs(key_flats + 2) + 3) / 7);
+    fps = (key_flats >= 0 ? -1 : 1) * ((abs(key_flats + 2) + 3) / 7);  //TODO: this is where I left off
 
     return ret;
 }
@@ -243,7 +228,7 @@ Key::Key(string n)
     char fc = n.at(0);
     int sn;
     if (fc >= 'A' && fc <= 'G') {
-        sn = fc - 'A';
+        sn = positive_modulo(fc - 'A' - 2, 7);
     } else {
         throw logic_error("Note must start with uppercase letter A-G");
     }
@@ -291,7 +276,7 @@ void Key::set_mode(int m, bool update)
             this->mode = m;
         } else if (m == MINOR) {
             this->mode = AEOLIAN;
-        }else {
+        } else {
             throw logic_error("Invalid mode");
         }
     } else {
@@ -430,7 +415,7 @@ Note::Note(int cn, int oct) : key(Key("C"))
     if (cn > 11 || cn < 0) {
         throw logic_error("tried to create invalid chromatic note");
     } else {
-        mn = (oct + 1)*12 + positive_modulo(cn - 3, 12);
+        mn = (oct + 1)*12 + cn;
     }
 
     if (mn > 127 || mn < 12) {
@@ -448,7 +433,7 @@ Note::Note(int cn, int oct, Key k) : key(k)
     if (cn > 11 || cn < 0) {
         throw logic_error("tried to create invalid chromatic note");
     } else {
-        mn = (oct + 1)*12 + positive_modulo(cn - 3, 12);
+        mn = (oct + 1)*12 + cn;
     }
 
     if (mn > 127 || mn < 12) {
@@ -507,7 +492,7 @@ void Note::_chrom_construct()
 
 Note::Note(int sn, int fs, int oct) : staff_n(sn), fps(fs), octave(oct), key(Key("C"))
 {
-    int mn = (oct +  1)*12 + positive_modulo(s_to_c(staff_n, fps)-3, 12);
+    int mn = (oct +  1)*12 + s_to_c(staff_n, fps);
     if (mn>127 || mn<12) {
         throw logic_error("Note staff constructor: note out of bounds");
     }
@@ -516,7 +501,7 @@ Note::Note(int sn, int fs, int oct) : staff_n(sn), fps(fs), octave(oct), key(Key
 
 Note::Note(int sn, int fs, int oct, Key k) : staff_n(sn), fps(fs), octave(oct), key(k)
 {
-    int mn = (oct + 1)*12 + positive_modulo(s_to_c(staff_n, fps)-3, 12);
+    int mn = (oct + 1)*12 + s_to_c(staff_n, fps);
     if (mn>127 || mn<12) {
         throw logic_error("Note staff constructor: note out of bounds");
     }
@@ -525,8 +510,7 @@ Note::Note(int sn, int fs, int oct, Key k) : staff_n(sn), fps(fs), octave(oct), 
 
 Note::Note(Key k, int oct, int intv, int fs) : key(k)
 {
-    int mn = (oct+1)*12 + positive_modulo(key.get_chrom_n()-3,12)
-             + sintv_to_cintv(intv, fs);
+    int mn = (oct+1)*12 + key.get_chrom_n() + sintv_to_cintv(intv, fs);
     if (mn>127 || mn<12) {
         throw logic_error("Note interval constructor: note out of bounds");
     } else {
@@ -586,7 +570,7 @@ int Note::get_midi_n() const
 
 int Note::get_chrom_n() const
 {
-    return positive_modulo(this->midi_n + 3, 12);
+    return positive_modulo(this->midi_n, 12);
 }
 
 int Note::get_staff_n() const
