@@ -32,6 +32,30 @@ NoteSynth::~NoteSynth()
   delete_fluid_settings(settings);
 }
 
+void NoteSynth::note_on(Note n)
+{
+    fluid_synth_noteon(synth, 0, n.get_midi_n(), 127);
+}
+
+void NoteSynth::note_off(Note n)
+{
+    fluid_synth_noteoff(synth, 0, n.get_midi_n());
+}
+
+void NoteSynth::chord_on(vector<Note> notevec)
+{
+    for (int i = 0; i < notevec.size(); i++) {
+        note_on(notevec[i]);
+    }
+}
+
+void NoteSynth::chord_off(vector<Note> notevec)
+{
+    for (int i = 0; i < notevec.size(); i++) {
+        note_off(notevec[i]);
+    }
+}
+
 void NoteSynth::play_note(Note n)
 {
     int midi_n = n.get_midi_n();
@@ -53,49 +77,3 @@ void NoteSynth::play_chord(vector<Note> notevec)
         fluid_synth_noteoff(synth, 0, midi_n);
     }
 }
-
-/*
-int main(int argc, char** argv)
-{
-    Key::set_modal(true);
-    cout << "Flat-sharp limit: " << Key::get_flatsharp_limit() << endl;
-    cout << "Modal: " << Key::get_modal() << endl;
-    Key k(0, 2);
-    fluid_synth_t* synth;
-
-    int ch[] = {60, 64, 67, -1};
-    shift_chord(ch, -7);
-
-    synth = setup_fluid_p();
-    play_chord(ch, synth);
-
-    teardown_fluid_p();
-    return 0;
-}
-
-int play_chord(int notes[MAX_CHORD_LENGTH], fluid_synth_t* synth)
-{
-	int i, n;
-	for (i = 0; (n = notes[i])>0; i++) {
-		fluid_synth_noteon(synth, 0, notes[i], 80);
-	}
-	sleep(SUSTAIN_TIME);
-	for (i = 0; (n = notes[i])>0; i++) {
-		fluid_synth_noteoff(synth, 0, notes[i]);
-	}
-	return 0;
-}
-
-int shift_chord(int notes[MAX_CHORD_LENGTH], int shift)
-{
-	int i, n;
-	for (i=0; (n=notes[i])>0; i++) {
-		if (n + shift >= 0) {
-			notes[i] = n + shift;
-		} else {
-			return 1;
-		}
-	}
-	return 0;
-}
-*/

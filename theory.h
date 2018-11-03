@@ -1,5 +1,6 @@
 /*
- *  Classes to represent musical objects in equal-tempered harmony--
+ *  theory.h
+ *  Classes to represent basic musical objects in equal-tempered harmony--
  *  keys and notes.
  *  Author: Paul Clarke
  *  5/2/18
@@ -160,6 +161,10 @@ private:
     int fps; //flats or sharps on staff_n
 };
 
+/* helper function to construct a Key given the number of sharps or flats
+ * in that key. key_from_sharps(G, LYDIAN) */
+Key key_from_sharps(int sharps, int mode);
+
 /* represents notes from C0(midi number 12) to G9(midi number 127) */
 class Note
 {
@@ -173,11 +178,19 @@ public:
     Note(Key k, int oct, int intv=0, int fs=0);
     /* transpose chromatically.*/
     Note ctranspose(int c_intv);
-    /* transpose via the key center. The only difference is potentially
-     * how the new notes are notated.  */
+    /* transpose via the key center. The relationship between the note and the
+       key center stays the same. The only difference between ktranspose and
+       ctranspose is potentially how the new notes are notated.  */
+    /* move the key center up by c_intv half steps, choosing the enharmonic
+       with the least flats/sharps. */
     Note ktranspose(int c_intv);
     Note ktranspose(int s_intv, int fs);
+    /* transpose to the new Key k. If which is 1, tranpose up to the nearest
+       octave, if its 2, transpose an octave obove that, etc. Same for negatives.
+       If which is 0, simply tranpose to the nearest instancec of k */
     Note ktranspose(Key k, int which=0);
+    // return the key centered on this note's value. m is the mode of the new Key.
+    Key to_key(int m);
     int get_midi_n() const;
     int get_chrom_n() const;
     int get_staff_n() const;
@@ -185,6 +198,8 @@ public:
     int get_octave() const;
     Key get_key() const;
     std::string disp() const;
+    bool operator<(const Note &Note2);
+    bool operator>(const Note &Note2);
 private:
     void _chrom_construct();
     int midi_n;

@@ -1,4 +1,5 @@
 /*
+ *  theory.cpp
  *  Classes to represent basic musical objects in equal-tempered harmony-
  *  keys and notes.
  *  Author: Paul Clarke
@@ -15,8 +16,8 @@
  * To stay consistent, the comments use a similar terminology. What is usually
  * called a "major second" is here called a major first. A "perfect fifth" is
  * called a perfect fourth, and so on. An octave becomes a septave. This comment
- * the only place you will see the normal terminology. This new terminology is
- * what should be used in music, though, so I hope you get
+ * is the only place you'll see the normal terminology. This new terminology is
+ * what should have been used from the start in music, though, so I hope you get
  * used to it :).
  */
 
@@ -28,6 +29,7 @@
 #include <cmath>
 
 using namespace std;
+
 
 /* https://stackoverflow.com/questions/14997165 */
 int positive_modulo(int i, int n) {
@@ -197,7 +199,7 @@ int resolve_chromatic(int c_note, int mode, int &fps)
 
     int ret  = positive_modulo(S_C + key_flats * 3, 7);
     /* reverse: positive for sharps, negative for flats */
-    fps = (key_flats >= 0 ? -1 : 1) * ((abs(key_flats + 2) + 3) / 7);  //TODO: this is where I left off
+    fps = (key_flats >= 0 ? -1 : 1) * ((abs(key_flats + 2) + 3) / 7);
 
     return ret;
 }
@@ -383,6 +385,14 @@ void Key::set_modal(bool m)
     modal = m;
 }
 
+Key key_from_sharps(int sharps, int mode)
+{
+    int major_sharps = sharps + mode_flats(mode);
+    int staff_n = positive_modulo(S_C - 3 * major_sharps, 7);
+    int fps = (major_sharps >= 0 ? 1 : -1) * ((abs(major_sharps - 2) + 3) / 7);
+    return Key(staff_n, fps, mode);
+}
+
 /* Note functions */
 Note::Note(int mn) : key(Key("C"))
 {
@@ -563,6 +573,11 @@ Note Note::ktranspose(Key k, int which)
     return Note(k, new_key_oct, this_intv, this_fs);
 }
 
+Key Note::to_key(int m)
+{
+    return Key(this->staff_n, this->fps, m);
+}
+
 int Note::get_midi_n() const
 {
     return this->midi_n;
@@ -596,4 +611,14 @@ Key Note::get_key() const
 string Note::disp() const
 {
     return s_fps_str(this->staff_n, this->fps) + std::to_string(this->octave);
+}
+
+bool Note::operator<(const Note &Note2)
+{
+    return this->get_midi_n() < Note2.get_midi_n();
+}
+
+bool Note::operator>(const Note &Note2)
+{
+    return this->get_midi_n() > Note2.get_midi_n();
 }

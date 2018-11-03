@@ -1,5 +1,6 @@
 #include "synth1.h"
 #include "theory.h"
+#include "quiz.h"
 
 #include <vector>
 #include <assert.h>
@@ -234,7 +235,6 @@ int test_key_staff_constructor() {
     istringstream stream1(out.str());
     ifstream stream2("testing/staff_constructor.txt");
     assert (streams_equal(&stream1, &stream2));
-
 }
 
 int test_key_text_constructor() {
@@ -252,6 +252,27 @@ int test_key_text_constructor() {
     istringstream stream1(out.str());
     ifstream stream2("testing/text_constructor.txt");
     assert (streams_equal(&stream1, &stream2));
+}
+
+int test_key_from_sharps()
+{
+    Key::set_modal(true);
+    Key::set_flatsharp_limit(20);
+    Key k = key_from_sharps(2, LYDIAN);
+    assert (k.get_staff_n() == S_G);
+    assert (k.get_fps() == 0);
+    assert (k.get_mode() == LYDIAN);
+    k = key_from_sharps(-8, AEOLIAN);
+    assert (k.get_staff_n() == S_D);
+    assert (k.get_fps() == -1);
+    assert (k.get_mode() == AEOLIAN);
+    k = key_from_sharps(8, LYDIAN);
+    assert (k.get_staff_n() == S_C);
+    assert (k.get_fps() == 1);
+    assert (k.get_mode() == LYDIAN);
+    k = key_from_sharps(-15, MAJOR);
+    assert (k.get_staff_n() == S_F);
+    assert (k.get_fps() == -2);
 }
 
 int test_key_misc()
@@ -436,6 +457,22 @@ int test_note_ktranspose()
     assert (m.get_midi_n() == 53);
 }
 
+/* tests for functions in the file quiz.cpp */
+
+int man_test_transpose_q()
+{
+    NoteSynth synth = NoteSynth();
+    vector<Note> chord{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4), Note(C_B, 4)}; //Cmaj7
+    for (int n=0; n < 100; n++) {
+    ChordQItem res = transpose_q(chord, 30, 88, "maj7", 7, false);
+    //for (int i=0; i < res.notevec.size(); i++) {
+    //    cout << res.notevec[i].disp() << " " << res.notevec[i].get_midi_n() << endl;
+    //}
+    cout << res.name << endl;
+    synth.play_chord(res.notevec);
+}
+}
+
 int test_free_functions()
 {
     cout << "----------------------------------------------------------------" << endl;
@@ -477,6 +514,9 @@ int test_key()
     cout << endl << "Test passed. ";
     cout << "Testing text constructor..." << endl;
     test_key_text_constructor();
+    cout << "Test passed." << endl;
+    cout << "Testing key_from_sharps..." << endl;
+    test_key_from_sharps();
     cout << "Test passed." << endl << endl;
 }
 
@@ -502,20 +542,23 @@ int test_note()
     cout << "Test passed." << endl << endl;
 }
 
+
+
 int test_misc()
 {
-    NoteSynth synth;
-    vector<Note> v1{Note(C_C, 4)}; //, Note(S_D, -1, 4, Key("G"))};
-    synth.play_chord(v1);
+
 }
 
 int main(int argc, char** argv)
 {
+    man_test_transpose_q();
+    /*
     test_misc();
-
     test_free_functions();
     test_key();
     test_note();
+    /*
     cout << "----------------------------------------------------------------" << endl;
     cout << "All tests passed.\n";
+    */
 }
