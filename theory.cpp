@@ -146,10 +146,10 @@ int add_intv(int base_sn, int base_fps, int intv_sn, int intv_fps, int &res_fps)
 
 int get_intv(int low_sn, int low_fps, int up_sn, int up_fps, int &intv_fps)
 {
-    int key_sharps = -s_note_flats(low_sn, low_fps);
+    int chromatic_distance = positive_modulo(s_to_c(up_sn, 0) - s_to_c(low_sn, 0), 12) - low_fps + up_fps;
     int intv_sn = positive_modulo(up_sn - low_sn, 7);
-    int nec = thirds_from_six(intv_sn);
-    intv_fps = up_fps - floor((float) key_sharps / (float) 7) - ((positive_modulo(key_sharps, 7)>=(nec + 1)) ? 1 : 0);
+    int intv_sn_dist = s_to_c(intv_sn, 0);
+    intv_fps = chromatic_distance - intv_sn_dist;
     return intv_sn;
 }
 
