@@ -201,8 +201,7 @@ public:
     bool operator<(const Note &Note2);
     bool operator>(const Note &Note2);
 private:
-    void _chrom_construct();
-    int midi_n;
+    void _chrom_construct(int mn);
     int staff_n;
     int fps;
     int octave;

@@ -551,14 +551,14 @@ int test_misc()
 
 int main(int argc, char** argv)
 {
-    man_test_transpose_q();
-    /*
+    //man_test_transpose_q();
+
     test_misc();
     test_free_functions();
     test_key();
     test_note();
-    /*
+
     cout << "----------------------------------------------------------------" << endl;
     cout << "All tests passed.\n";
-    */
+
 }
