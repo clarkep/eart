@@ -396,24 +396,12 @@ Key key_from_sharps(int sharps, int mode)
 /* Note functions */
 Note::Note(int mn)
 {
-    int oc = -1;
-    if (mn > 127 || mn < 12) {
-        throw logic_error("midi note number is out of range(12-127)");
-    } else {
-        oc = (mn / 12) - 1;
-    }
-    this->octave = oc;
+    this->octave = (mn / 12) - 1;
     _chrom_construct(mn, Key("C"));
 }
 Note::Note(int mn, Key k)
 {
-    int oc = -1;
-    if (mn > 127 || mn < 12) {
-        throw logic_error("midi note number is out of range(12-127)");
-    } else {
-        oc = (mn / 12) - 1;
-    }
-    this->octave = oc;
+    this->octave = (mn / 12) - 1;
     _chrom_construct(mn, k);
 }
 
@@ -426,12 +414,8 @@ Note::Note(int cn, int oct)
         mn = (oct + 1)*12 + cn;
     }
 
-    if (mn > 127 || mn < 12) {
-        throw logic_error("tried to create note out of range");
-    } else {
-        this->octave = oct;
-        _chrom_construct(mn, Key("C"));
-    }
+    this->octave = oct;
+    _chrom_construct(mn, Key("C"));
 }
 
 Note::Note(int cn, int oct, Key k)
@@ -443,12 +427,8 @@ Note::Note(int cn, int oct, Key k)
         mn = (oct + 1)*12 + cn;
     }
 
-    if (mn > 127 || mn < 12) {
-        throw logic_error("tried to create note out of range");
-    } else {
-        this->octave = oct;
-        _chrom_construct(mn, k);
-    }
+    this->octave = oct;
+    _chrom_construct(mn, k);
 }
 
 /* Currently this assigns flatted values to all accidentals except for
@@ -498,20 +478,13 @@ void Note::_chrom_construct(int midi_n, Key k)
 
 Note::Note(int sn, int fs, int oct) : staff_n(sn), fps(fs), octave(oct)
 {
-    int mn = (oct +  1)*12 + s_to_c(staff_n, fps);
-    if (mn>127 || mn<12) {
-        throw logic_error("Note staff constructor: note out of bounds");
-    }
+
 }
 
 Note::Note(Key k, int oct, int intv, int fs)
 {
     int mn = (oct+1)*12 + k.get_chrom_n() + sintv_to_cintv(intv, fs);
-    if (mn>127 || mn<12) {
-        throw logic_error("Note interval constructor: note out of bounds");
-    } else {
-        this->octave = (mn/12) - 1;
-    }
+    this->octave = (mn/12) - 1;
     this->staff_n = add_intv(k.get_staff_n(), k.get_fps(), intv, fs, this->fps);
 }
 
