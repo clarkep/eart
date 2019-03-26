@@ -174,7 +174,6 @@ public:
     Note(int cn, int oct);
     Note(int cn, int oct, Key k);
     Note(int sn, int fs, int oct);
-    Note(int sn, int fs, int oct, Key k);
     Note(Key k, int oct, int intv=0, int fs=0);
     /* transpose chromatically.*/
     Note ctranspose(int c_intv);
@@ -183,12 +182,12 @@ public:
        ctranspose is potentially how the new notes are notated.  */
     /* move the key center up by c_intv half steps, choosing the enharmonic
        with the least flats/sharps. */
-    Note ktranspose(int c_intv);
-    Note ktranspose(int s_intv, int fs);
+    Note ktranspose(Key k_orig, int c_intv);
+    Note ktranspose(Key k_orig, int s_intv, int fs);
     /* transpose to the new Key k. If which is 1, tranpose up to the nearest
        octave, if its 2, transpose an octave obove that, etc. Same for negatives.
        If which is 0, simply tranpose to the nearest instancec of k */
-    Note ktranspose(Key k, int which=0);
+    Note ktranspose(Key k_orig, Key k_dest, int which=0);
     // return the key centered on this note's value. m is the mode of the new Key.
     Key to_key(int m);
     int get_midi_n() const;
@@ -196,16 +195,14 @@ public:
     int get_staff_n() const;
     int get_fps() const;
     int get_octave() const;
-    Key get_key() const;
     std::string disp() const;
     bool operator<(const Note &Note2);
     bool operator>(const Note &Note2);
 private:
-    void _chrom_construct(int mn);
+    void _chrom_construct(int mn, Key k);
     int staff_n;
     int fps;
     int octave;
-    Key key;
 };
 
 #endif

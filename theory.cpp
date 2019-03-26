@@ -394,7 +394,7 @@ Key key_from_sharps(int sharps, int mode)
 }
 
 /* Note functions */
-Note::Note(int mn) : key(Key("C"))
+Note::Note(int mn)
 {
     int oc = -1;
     if (mn > 127 || mn < 12) {
@@ -403,9 +403,9 @@ Note::Note(int mn) : key(Key("C"))
         oc = (mn / 12) - 1;
     }
     this->octave = oc;
-    _chrom_construct(mn);
+    _chrom_construct(mn, Key("C"));
 }
-Note::Note(int mn, Key k) : key(k)
+Note::Note(int mn, Key k)
 {
     int oc = -1;
     if (mn > 127 || mn < 12) {
@@ -414,10 +414,10 @@ Note::Note(int mn, Key k) : key(k)
         oc = (mn / 12) - 1;
     }
     this->octave = oc;
-    _chrom_construct(mn);
+    _chrom_construct(mn, k);
 }
 
-Note::Note(int cn, int oct) : key(Key("C"))
+Note::Note(int cn, int oct)
 {
     int mn = 0;
     if (cn > 11 || cn < 0) {
@@ -430,11 +430,11 @@ Note::Note(int cn, int oct) : key(Key("C"))
         throw logic_error("tried to create note out of range");
     } else {
         this->octave = oct;
-        _chrom_construct(mn);
+        _chrom_construct(mn, Key("C"));
     }
 }
 
-Note::Note(int cn, int oct, Key k) : key(k)
+Note::Note(int cn, int oct, Key k)
 {
     int mn = 0;
     if (cn > 11 || cn < 0) {
@@ -447,7 +447,7 @@ Note::Note(int cn, int oct, Key k) : key(k)
         throw logic_error("tried to create note out of range");
     } else {
         this->octave = oct;
-        _chrom_construct(mn);
+        _chrom_construct(mn, k);
     }
 }
 
@@ -457,17 +457,17 @@ Note::Note(int cn, int oct, Key k) : key(k)
  * flat 5, or Cb (If you want B, you have to use one of staff note
  * constructors). It may be smart to modify this to prefer
  * interpretations with fewer flats or sharps. */
-void Note::_chrom_construct(int midi_n)
+void Note::_chrom_construct(int midi_n, Key k)
 {
     int chrom_n = midi_n % 12;
 /* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
-    int chrom_i = this->key.get_chrom_n();
-    int staff_i = this->key.get_staff_n();
-    int fps_i = this->key.get_fps();
+    int chrom_i = k.get_chrom_n();
+    int staff_i = k.get_staff_n();
+    int fps_i = k.get_fps();
     /* if major mode, we say sharp three; else flat four */
     int fourths_count =
-    (this->key.get_mode() == IONIAN || this->key.get_mode() == LYDIAN ||
-    this->key.get_mode() == MIXOLYDIAN) ? 7 : 6;
+    (k.get_mode() == IONIAN || k.get_mode() == LYDIAN ||
+    k.get_mode() == MIXOLYDIAN) ? 7 : 6;
     for(int i = 0; i < fourths_count; i++) {
         if (chrom_n == chrom_i) {
             this->staff_n = staff_i;
@@ -479,9 +479,9 @@ void Note::_chrom_construct(int midi_n)
         if (staff_i == S_F) {fps_i += 1;}
     }
 /* It's none of those. Now check by thirds 3, b6, b2, b5, b8, b4.*/
-    chrom_i = (this->key.get_chrom_n() + 5) % 12;
-    staff_i = (this->key.get_staff_n() + 3) % 7;
-    fps_i = (staff_i == S_B) ? this->key.get_fps() + 1 : this->key.get_fps();
+    chrom_i = (k.get_chrom_n() + 5) % 12;
+    staff_i = (k.get_staff_n() + 3) % 7;
+    fps_i = (staff_i == S_B) ? k.get_fps() + 1 : k.get_fps();
     for (int i = 0; i < (12 - fourths_count); i++) {
         if (chrom_n == chrom_i) {
             this->staff_n = staff_i;
@@ -496,7 +496,7 @@ void Note::_chrom_construct(int midi_n)
     throw logic_error("Error in _chrom_construct");
 }
 
-Note::Note(int sn, int fs, int oct) : staff_n(sn), fps(fs), octave(oct), key(Key("C"))
+Note::Note(int sn, int fs, int oct) : staff_n(sn), fps(fs), octave(oct)
 {
     int mn = (oct +  1)*12 + s_to_c(staff_n, fps);
     if (mn>127 || mn<12) {
@@ -504,56 +504,48 @@ Note::Note(int sn, int fs, int oct) : staff_n(sn), fps(fs), octave(oct), key(Key
     }
 }
 
-Note::Note(int sn, int fs, int oct, Key k) : staff_n(sn), fps(fs), octave(oct), key(k)
+Note::Note(Key k, int oct, int intv, int fs)
 {
-    int mn = (oct + 1)*12 + s_to_c(staff_n, fps);
-    if (mn>127 || mn<12) {
-        throw logic_error("Note staff constructor: note out of bounds");
-    }
-}
-
-Note::Note(Key k, int oct, int intv, int fs) : key(k)
-{
-    int mn = (oct+1)*12 + key.get_chrom_n() + sintv_to_cintv(intv, fs);
+    int mn = (oct+1)*12 + k.get_chrom_n() + sintv_to_cintv(intv, fs);
     if (mn>127 || mn<12) {
         throw logic_error("Note interval constructor: note out of bounds");
     } else {
         this->octave = (mn/12) - 1;
     }
-    this->staff_n = add_intv(key.get_staff_n(), key.get_fps(), intv, fs, this->fps);
+    this->staff_n = add_intv(k.get_staff_n(), k.get_fps(), intv, fs, this->fps);
 }
 
 Note Note::ctranspose(int c_intv)
 {
-    return Note(this->get_midi_n() + c_intv, this->key);
+    return Note(this->get_midi_n() + c_intv);
 }
 
 
-Note Note::ktranspose(int c_intv)
+Note Note::ktranspose(Key k_orig, int c_intv)
 {
     int intv_fs = 0;
-    int this_intv = get_intv(this->key.get_staff_n(), this->key.get_fps(), this->staff_n, this->fps, intv_fs);
+    int this_intv = get_intv(k_orig.get_staff_n(), k_orig.get_fps(), this->staff_n, this->fps, intv_fs);
     int key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv, intv_fs) + c_intv) / 12 - 1;
 
-    return Note(Key(positive_modulo(this->key.get_chrom_n() + c_intv, 12), this->key.get_mode()), key_oct, this_intv, intv_fs);
+    return Note(Key(positive_modulo(k_orig.get_chrom_n() + c_intv, 12), k_orig.get_mode()), key_oct, this_intv, intv_fs);
 }
 
 /* TODO: ensure that this works for negative intervals */
-Note Note::ktranspose(int s_intv, int fs)
+Note Note::ktranspose(Key k_orig, int s_intv, int fs)
 {
     int this_fs = 0;
-    int this_intv = get_intv(this->key.get_staff_n(), this->key.get_fps(), this->staff_n, this->fps, this_fs);
+    int this_intv = get_intv(k_orig.get_staff_n(), k_orig.get_fps(), this->staff_n, this->fps, this_fs);
     int new_key_oct = (get_midi_n() - sintv_to_cintv(this_intv, this_fs) + sintv_to_cintv(s_intv, fs)) / 12 -1;
     int new_key_fs = 0;
-    int new_key_sn = add_intv(this->key.get_staff_n(), this->key.get_fps(), s_intv, fs, new_key_fs);
-    return Note(Key(new_key_sn, new_key_fs, this->key.get_mode()), new_key_oct, this_intv, this_fs);
+    int new_key_sn = add_intv(k_orig.get_staff_n(), k_orig.get_fps(), s_intv, fs, new_key_fs);
+    return Note(Key(new_key_sn, new_key_fs, k_orig.get_mode()), new_key_oct, this_intv, this_fs);
 }
 
-Note Note::ktranspose(Key k, int which)
+Note Note::ktranspose(Key k_orig, Key k_dest, int which)
 {
     int this_fs = 0;
-    int this_intv = get_intv(this->key.get_staff_n(), this->key.get_fps(), this->staff_n, this->fps, this_fs);
-    int pos_dist = positive_modulo(k.get_chrom_n() - this->key.get_chrom_n(), 12);
+    int this_intv = get_intv(k_orig.get_staff_n(), k_orig.get_fps(), this->staff_n, this->fps, this_fs);
+    int pos_dist = positive_modulo(k_dest.get_chrom_n() - k_orig.get_chrom_n(), 12);
     int new_key_oct;
     if (which > 0) {
         new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv, this_fs) + pos_dist) / 12 - 1 + (which - 1);
@@ -563,7 +555,7 @@ Note Note::ktranspose(Key k, int which)
         new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv, this_fs) +
             ((pos_dist <= 6) ? (pos_dist) : (-12 + pos_dist))) / 12 -1;
     }
-    return Note(k, new_key_oct, this_intv, this_fs);
+    return Note(k_dest, new_key_oct, this_intv, this_fs);
 }
 
 Key Note::to_key(int m)
@@ -594,11 +586,6 @@ int Note::get_fps() const
 int Note::get_octave() const
 {
     return this->octave;
-}
-
-Key Note::get_key() const
-{
-    return this->key;
 }
 
 string Note::disp() const

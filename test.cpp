@@ -338,7 +338,7 @@ int test_note_chrom_constructor()
 int test_note_staff_constructor()
 {
     Key::set_modal(true);
-    Note n = Note(S_C, -1, 4, Key("Gb"));
+    Note n = Note(S_C, -1, 4);
     assert (n.get_midi_n() == 71);
     assert (n.get_chrom_n() == C_B);
     n = Note(S_C, -1, 4);
@@ -415,22 +415,20 @@ int test_note_ktranspose()
     assert (n.get_staff_n() == S_E);
     assert (n.get_fps() == 0);
     assert (n.get_midi_n() == 88);
-    n = n.ktranspose(-4); // into key of Ab bc Ab has less accidentals than G#
+    n = n.ktranspose(Key("C"), -4); // into key of Ab bc Ab has less accidentals than G#
     assert (n.get_staff_n() == S_C);
     assert (n.get_fps() == 0);
     assert (n.get_midi_n() == 84);
     assert (n.get_octave() == 6);
-    n = n.ktranspose(4, 1); // into key of E
+    n = n.ktranspose(Key("Ab"), 4, 1); // into key of E
     assert (n.get_staff_n() == S_G);
     assert (n.get_fps() == 1);
     assert (n.get_midi_n() == 92);
-    n = n.ktranspose(-8, 0); // into key of D#, which has 9 sharps.
+    n = n.ktranspose(Key("E"), -8, 0); // into key of D#, which has 9 sharps.
     assert (n.get_staff_n() == S_F); // 2 of D# is F##
     assert (n.get_fps() == 2);
     assert (n.get_midi_n() == 79);
-    n = n.ktranspose(4, 0); // now into key of Bb, because A# is above fs limit
-    assert (n.get_key().get_staff_n() == S_B);
-    assert (n.get_key().get_fps() == -1);
+    n = n.ktranspose(Key("D#"), 4, 0); // now into key of Bb, because A# is above fs limit
     assert (n.get_staff_n() == S_D);
     assert (n.get_fps() == 0);
     assert (n.get_midi_n() == 86);
@@ -442,16 +440,16 @@ int test_note_ktranspose()
     assert (m.get_fps() == 0);
     assert (m.get_midi_n() == 36);
     assert (m.get_octave() == 2);
-    m = m.ktranspose(Key("Gb"));
+    m = m.ktranspose(Key("F#"), Key("Gb"));
     assert (m.get_staff_n() == S_D);
     assert (m.get_fps() == -2);
     assert (m.get_midi_n() == 36);
     assert (m.get_octave() == 2);
-    m = m.ktranspose(Key("A"), 1);
+    m = m.ktranspose(Key("Gb"), Key("A"), 1);
     assert (m.get_staff_n() == S_E);
     assert (m.get_fps() == -1);
     assert (m.get_midi_n() == 39);
-    m = m.ktranspose(Key("B"), 2);
+    m = m.ktranspose(Key("A"), Key("B"), 2);
     assert (m.get_staff_n() == S_F);
     assert (m.get_fps() == 0);
     assert (m.get_midi_n() == 53);

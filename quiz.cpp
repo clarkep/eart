@@ -34,7 +34,8 @@ ChordQItem transpose_q(std::vector<Note> chord, int min_mn, int max_mn,
     int shift = (rand() % (uprange + downrange + 1)) - downrange;
 
     /* figure out what keys we could be in and choose one*/
-    Key k0 = chord[0].get_key();
+    //Key k0 = chord[0].get_key();
+    Key k0 = Key("C"); // TODO: this is a workaround because notes no longer have keys.
     int fps = 0;
     int s_note = resolve_chromatic(positive_modulo(k0.get_chrom_n() + shift, 12), k0.get_mode(), fps);
     int sharp_enharms_available = (flatsharp_limit + s_note_flats(s_note, fps) + mode_flats(k0.get_mode())) / 12;
