@@ -36,34 +36,33 @@ ChordQItem transpose_q(std::vector<Note> chord, int min_mn, int max_mn,
     /* figure out what keys we could be in and choose one*/
     //Key k0 = chord[0].get_key();
     Key k0 = Key("C"); // TODO: this is a workaround because notes no longer have keys.
-    int fps = 0;
-    int s_note = resolve_chromatic(positive_modulo(k0.get_chrom_n() + shift, 12), k0.get_mode(), fps);
-    int sharp_enharms_available = (flatsharp_limit + s_note_flats(s_note, fps) + mode_flats(k0.get_mode())) / 12;
-    int flat_enharms_available = (flatsharp_limit - s_note_flats(s_note, fps) - mode_flats(k0.get_mode())) / 12;
+    s_note sn = resolve_chromatic(positive_modulo(k0.get_chrom_n() + shift, 12), k0.get_mode());
+    int sharp_enharms_available = (flatsharp_limit + s_note_flats(sn) + mode_flats(k0.get_mode())) / 12;
+    int flat_enharms_available = (flatsharp_limit - s_note_flats(sn) - mode_flats(k0.get_mode())) / 12;
     int enharm = 0;
     if (sharp_enharms_available + flat_enharms_available > 0) {
         enharm = (rand() % (sharp_enharms_available + flat_enharms_available + 1)) - flat_enharms_available;
     }
     if (enharm > 0) {
         for (int i = 0; i < enharm; i++) {
-            s_note = positive_modulo(s_note - 1, 7);
-            if (s_note == S_B || s_note == S_E) {
-                fps += 1;
+            sn.n = positive_modulo(sn.n - 1, 7);
+            if (sn.n == S_B || sn.n == S_E) {
+                sn.fps += 1;
             } else {
-                fps += 2;
+                sn.fps += 2;
             }
         }
     } else if (enharm < 0) {
         for (int i = 0; i < abs(enharm); i++) {
-            s_note = positive_modulo(s_note + 1, 7);
-            if (s_note == S_F || s_note == S_C) {
-                fps -= 1;
+            sn.n = positive_modulo(sn.n + 1, 7);
+            if (sn.n == S_F || sn.n == S_C) {
+                sn.fps -= 1;
             } else {
-                fps -= 2;
+                sn.fps -= 2;
             }
         }
     }
-    Key k1 = Key(s_note, fps, k0.get_mode());
+    Key k1 = Key(sn, k0.get_mode());
 
     ChordQItem result;
     vector<Note> new_chord;
@@ -121,7 +120,7 @@ ChordQItem major_triad_quiz()
     vector<Note> notes;
     for(int i = 0; i < 3; i++)
     {
-        Note n = Note(k, oct, 2*i, 0);
+        Note n = Note(k, oct, SN(2*i, 0));
         if (inv > i) {
             n = n.ctranspose(12);
         }

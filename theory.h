@@ -69,31 +69,42 @@
 #define MAJOR 0
 #define MINOR -1
 
+#define SN(A, B) (s_note){(A), (B)}
+
+typedef int c_note;
+typedef struct s_note {
+    int n;
+    int fps;
+} s_note;
+typedef int mode_i;
+
+bool s_note_eq(s_note a, s_note b);
+
 int positive_modulo(int i, int n);
 
 /* string representations of note and mode ints */
-std::string c_note_str(int c);
+std::string c_note_str(c_note c);
 std::string s_note_str(int s);
-std::string s_fps_str(int s, int fps);
-std::string mode_str(int m);
+std::string s_fps_str(s_note s);
+std::string mode_str(mode_i m);
 
 int thirds_from_six(int sn);
-int add_intv(int base_sn, int base_fps, int intv_sn, int intv_fps, int &res_fps);
-int get_intv(int low_sn, int low_fps, int up_sn, int up_fps, int &intv_fps);
+s_note add_intv(s_note base, s_note intv);
+s_note get_intv(s_note lower, s_note upper);
 
 /* Determine how many flats are in the mode relative to major. Lydian
  * mode return -1.*/
-int mode_flats(int mode);
+int mode_flats(mode_i m);
 /* Determine how many flats are in the major mode of the given note(in
  * staff notation).  Sharps are returned as negative numbers.*/
-int s_note_flats(int s, int fps);
+int s_note_flats(s_note note);
 /* chromatic representation of a staff note */
-int s_to_c(int s, int fps);
+c_note s_to_c(s_note note);
 /* how many half steps in the interval. Intervals are specified starting
  * from zero, so 0 is unison, 1, is a major second, 4 is a perfect fifth,
  * 7 is an octave, etc. */
-int sintv_to_cintv(int sintv, int fps);
-int resolve_chromatic(int c_note, int mode, int &fps);
+c_note sintv_to_cintv(s_note sintv);
+s_note resolve_chromatic(c_note cn, mode_i mode);
 
 /*
  * A Key represents one of the 12 equal tempered notes from
@@ -111,31 +122,33 @@ class Key
 {
 public:
      /* Using  the chromatic constructor, Key will find the enharmonic of cn
-     whose given mode has the fewest flats or sharps. Ties go to sharps for
-     lydian(B) and ionian(F#), flats for all others. Returns the staff note
-     number, and sets fps to -1 for flat, 0 for natural, and +1 for sharp on
-     that note.
+    whose given mode has the fewest flats or sharps. Ties go to sharps for
+    lydian(B lydian is chosen over Cb lydian) and ionian(F# ionian is chosen
+    over Gb ionian), flats for all others.
 
      For darker modes, this can have difficult results- for
      example, in the locrian mode, it will return A#(5 sharps) instead of
-     Bb(7 flats). That's why it's recommended to set Key::modal to
+     Bb(7 flats). That's why it's usually better to set Key::modal to
      false and only use major/minor. */
-    Key(int cn, int m); //chromatic(mod 12) representation, and mode.
+    Key(c_note cn, mode_i m); //chromatic representation, and mode.
 
     /* Using the following constructors, key will use the given representation
     unless the mode m of the key has more than flatsharp_limit flats or sharps.
     flatsharp_limit is 7 by default and can be changed with static method
     set_flatsharp_limit. */
-    Key(int sn, int fs, int m); // 7-note representation, and mode.
-    Key(std::string n);        //string representation
-    int interval_in_key(int c_note, int &fps);
-    int get_mode() const;
+    Key(s_note sn, mode_i m); // 7-note representation, and mode.
+    Key(std::string n);       //string representation
+
+    /* given any chromatic note, find an interval that the note makes with this
+    key.  */
+    s_note interval_in_key(c_note cn);
+
+    mode_i get_mode() const;
     /* if update_repr is true, set_mode rechecks the key signature
      * against the flat-sharp limit. */
-    void set_mode(int m, bool update_repr=true);
-    int get_chrom_n() const;
-    int get_staff_n() const; // get flats or sharps with get_fps
-    int get_fps() const;
+    void set_mode(mode_i m, bool update_repr=true);
+    c_note get_chrom_n() const;
+    s_note get_staff_n() const;
     std::string disp() const; // just display note name
     std::string disp_full() const; // include mode
     /* The maximum flats or sharps before converting to an enharmonic key. By
@@ -151,20 +164,19 @@ public:
     static bool get_modal();
     static void set_modal(bool m);
 private:
-    void _staff_construct(int sn, int fs, int m);
+    void _staff_construct(s_note sn, mode_i);
     void _update_repr();
 
     static int flatsharp_limit;
     static bool modal;
-    int chrom_n;
-    int mode;
-    int staff_n;
-    int fps; //flats or sharps on staff_n
+    c_note chrom_n;
+    mode_i mode;
+    s_note staff_n;
 };
 
 /* helper function to construct a Key given the number of sharps or flats
  * in that key. key_from_sharps(G, LYDIAN) */
-Key key_from_sharps(int sharps, int mode);
+Key key_from_sharps(int sharps, mode_i mode);
 
 /* represents notes from C0(midi number 12) to G9(midi number 127) */
 class Note
@@ -172,19 +184,19 @@ class Note
 public:
     Note(int mn); // midi keycode
     Note(int mn, Key k);
-    Note(int cn, int oct);
-    Note(int cn, int oct, Key k);
-    Note(int sn, int fs, int oct);
-    Note(Key k, int oct, int intv=0, int fs=0);
+    Note(c_note cn, int oct);
+    Note(c_note cn, int oct, Key k);
+    Note(s_note, int oct);
+    Note(Key k, int oct, s_note intv = (s_note){0, 0});
     /* transpose chromatically.*/
-    Note ctranspose(int c_intv);
+    Note ctranspose(c_note c_intv);
     /* transpose via the key center. The relationship between the note and the
        key center stays the same. The only difference between ktranspose and
-       ctranspose is potentially how the new notes are notated.  */
-    /* move the key center up by c_intv half steps, choosing the enharmonic
+       ctranspose is potentially how the new notes are notated.
+       move the key center up by c_intv half steps, choosing the enharmonic
        with the least flats/sharps. */
-    Note ktranspose(Key k_orig, int c_intv);
-    Note ktranspose(Key k_orig, int s_intv, int fs);
+    Note ktranspose(Key k_orig, c_note c_intv);
+    Note ktranspose(Key k_orig, s_note sintv);
     /* transpose to the new Key k. If which is 1, tranpose up to the nearest
        octave, if its 2, transpose an octave obove that, etc. Same for negatives.
        If which is 0, simply tranpose to the nearest instancec of k */
@@ -192,17 +204,15 @@ public:
     // return the key centered on this note's value. m is the mode of the new Key.
     Key to_key(int m);
     int get_midi_n() const;
-    int get_chrom_n() const;
-    int get_staff_n() const;
-    int get_fps() const;
+    c_note get_chrom_n() const;
+    s_note get_staff_n() const;
     int get_octave() const;
     std::string disp() const;
     bool operator<(const Note &Note2);
     bool operator>(const Note &Note2);
 private:
     void _chrom_construct(int mn, Key k);
-    int staff_n;
-    int fps;
+    s_note staff_n;
     int octave;
 };
 

@@ -30,6 +30,10 @@
 
 using namespace std;
 
+bool s_note_eq(s_note a, s_note b)
+{
+    return (a.n == b.n) && (a.fps == b.fps);
+}
 
 /* https://stackoverflow.com/questions/14997165 */
 int positive_modulo(int i, int n) {
@@ -60,15 +64,15 @@ string s_note_str(int s)
     return r;
 }
 
-string s_fps_str(int s, int fps) {
-    string ret = s_note_str(s);
-    for (int i=0; i < abs(fps); i++) {
-        ret.append((fps > 0) ? "#" : "b");
+string s_fps_str(s_note sn) {
+    string ret = s_note_str(sn.n);
+    for (int i=0; i < abs(sn.fps); i++) {
+        ret.append((sn.fps > 0) ? "#" : "b");
     }
     return ret;
 }
 
-string c_note_str(int c) {
+string c_note_str(c_note c) {
     c = c % 12;
     string r = "";
     switch (c) {
@@ -100,7 +104,7 @@ string c_note_str(int c) {
     return r;
 }
 
-string mode_str(int m) {
+string mode_str(mode_i m) {
     if (m == MINOR) {
         return "Minor";
     }
@@ -135,71 +139,77 @@ int thirds_from_six(int sn)
     return (s2 - 6 + octave*7) / 3;
 }
 
-int add_intv(int base_sn, int base_fps, int intv_sn, int intv_fps, int &res_fps)
+s_note add_intv(s_note base, s_note intv)
 {
-    int key_sharps = -s_note_flats(base_sn, base_fps);
-    int nec = thirds_from_six(positive_modulo(intv_sn, 7)); //fourths from a major 7th, the first note to get a sharp.
-    int res_sn = positive_modulo(base_sn + intv_sn, 7);
-    res_fps = floor((float) key_sharps / (float) 7) + ((positive_modulo(key_sharps, 7)>=(nec + 1)) ? 1 : 0) + intv_fps;
-    return res_sn;
+    s_note res;
+    int key_sharps = -s_note_flats(base);
+    int nec = thirds_from_six(positive_modulo(intv.n, 7)); //fourths from a major 7th, the first note to get a sharp.
+    res.n = positive_modulo(base.n + intv.n, 7);
+    res.fps = floor((float) key_sharps / (float) 7) + ((positive_modulo(key_sharps, 7)>=(nec + 1)) ? 1 : 0) + intv.fps;
+    return res;
 }
 
-int get_intv(int low_sn, int low_fps, int up_sn, int up_fps, int &intv_fps)
+//int get_intv(int low_sn, int low_fps, int up_sn, int up_fps, int &intv_fps)
+s_note get_intv(s_note lower, s_note upper)
 {
-    int chromatic_distance = positive_modulo(s_to_c(up_sn, 0) - s_to_c(low_sn, 0), 12) - low_fps + up_fps;
-    int intv_sn = positive_modulo(up_sn - low_sn, 7);
-    int intv_sn_dist = s_to_c(intv_sn, 0);
-    intv_fps = chromatic_distance - intv_sn_dist;
-    return intv_sn;
+    s_note intv;
+    c_note chromatic_distance =
+    positive_modulo(s_to_c((s_note){upper.n, 0}) - s_to_c((s_note){lower.n, 0}), 12) - lower.fps + upper.fps;
+    intv.n = positive_modulo(upper.n - lower.n, 7);
+    c_note intv_sn_dist = s_to_c((s_note){intv.n, 0});
+    intv.fps = chromatic_distance - intv_sn_dist;
+    return intv;
 }
 
-int mode_flats(int mode) {
+int mode_flats(mode_i mode)
+{
     if (mode == MINOR) {
         mode = AEOLIAN;
     }
     return 5 - thirds_from_six(mode);
 }
 
-int s_note_flats(int s, int fps)
+int s_note_flats(s_note note)
 {
-    return thirds_from_six(s) - 5 + (fps * -7);
+    return thirds_from_six(note.n) - 5 + (note.fps * -7);
 }
 
-int s_to_c(int s, int fps)
+c_note s_to_c(s_note note)
 {
-    return positive_modulo(11 + thirds_from_six(s) * 5 + fps, 12);
+    return positive_modulo(11 + thirds_from_six(note.n) * 5 + note.fps, 12);
 }
 
-int sintv_to_cintv(int sintv, int fps)
+c_note sintv_to_cintv(s_note sintv)
 {
-    int oc = sintv / 7;
-    if (sintv < 0) {
+    int oc = sintv.n / 7;
+    if (sintv.n < 0) {
         oc = oc - 1; //intervals 0-6 should be octave 0; -6 to -1 are octave -1.
     }
-    int sint = positive_modulo(sintv, 7);
+    int sint = positive_modulo(sintv.n, 7);
     return
         positive_modulo(11 + thirds_from_six(sint)*5, 12)
-        + oc * 12 + fps;
+        + oc * 12 + sintv.fps;
 }
 
-int resolve_chromatic(int c_note, int mode, int &fps)
+s_note resolve_chromatic(c_note cn, mode_i mode)
 {
+    s_note ret;
     int m_flats = mode_flats(mode);
     /* Determine how many flats or sharps in major key of c_note */
     int octave = 0;
-    while ((c_note + octave * 12) % 5 != 0) {
+    while ((cn + octave * 12) % 5 != 0) {
         octave += 1;
     }
-    int key_flats = ((c_note + octave * 12) / 5);
+    int key_flats = ((cn + octave * 12) / 5);
     if (key_flats + m_flats > 6) {
         key_flats -= 12;
     } else if ((key_flats + m_flats == 6) && (m_flats <= 0)) {
         key_flats -= 12;
     }
 
-    int ret  = positive_modulo(S_C + key_flats * 3, 7);
+    ret.n  = positive_modulo(S_C + key_flats * 3, 7);
     /* reverse: positive for sharps, negative for flats */
-    fps = (key_flats >= 0 ? -1 : 1) * ((abs(key_flats + 2) + 3) / 7);
+    ret.fps = (key_flats >= 0 ? -1 : 1) * ((abs(key_flats + 2) + 3) / 7);
 
     return ret;
 }
@@ -207,7 +217,7 @@ int resolve_chromatic(int c_note, int mode, int &fps)
 int Key::flatsharp_limit = FLAT_SHARP_LIMIT;
 bool Key::modal = MODAL;
 
-Key::Key(int n, int m)
+Key::Key(c_note n, mode_i m)
 {
     if (n >= 0 && n < 12) {
         this->chrom_n = n;
@@ -215,88 +225,84 @@ Key::Key(int n, int m)
         throw logic_error("Invalid note given to Key chromatic constructor");
     }
     set_mode(m, false);
-    this->staff_n = resolve_chromatic(chrom_n, mode, this->fps);
+    this->staff_n = resolve_chromatic(chrom_n, this->mode);
     _update_repr();
 }
 
-Key::Key(int sn, int fs, int m)
+Key::Key(s_note sn, mode_i m)
 {
-    _staff_construct(sn, fs, m);
+    _staff_construct(sn, m);
 }
 
 Key::Key(string n)
 {
     n.append(" "); //avoid out-of-bounds
     char fc = n.at(0);
-    int sn;
+    s_note sn;
     if (fc >= 'A' && fc <= 'G') {
-        sn = positive_modulo(fc - 'A' - 2, 7);
+        sn.n = positive_modulo(fc - 'A' - 2, 7);
     } else {
         throw logic_error("Note must start with uppercase letter A-G");
     }
-    int fs = 0;
-    int m = 0;
+    sn.fps = 0;
+    mode_i m = 0;
     char nc;
     int i = 1;
     while ((nc = n.at(i)) == 'b' || (nc == '#')) {
-        fs += (nc == '#') ? 1 : -1;
+        sn.fps += (nc == '#') ? 1 : -1;
         i += 1;
     }
     if (nc == 'm') {
         m = MINOR;
     }
-    _staff_construct(sn, fs, m);
+    _staff_construct(sn, m);
 }
 
-void Key::_staff_construct(int sn, int fs, int m)
+void Key::_staff_construct(s_note sn, mode_i m)
 {
-    if (sn >= 0 && sn < 7) {
+    if (sn.n >= 0 && sn.n < 7) {
         this->staff_n = sn;
-        this->fps = fs;
     } else {
         throw logic_error("Invalid note given to staff-note constructor of Key");
     }
-    this->chrom_n = s_to_c(this->staff_n, this->fps);
+    this->chrom_n = s_to_c(this->staff_n);
     set_mode(m);
 }
 
-int Key::interval_in_key(int c_note, int &fps)
+s_note Key::interval_in_key(c_note cn)
 {
 /* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
-    int chrom_i = this->get_chrom_n();
-    int intv_i = 0;
-    int fps_i = 0;
+    c_note chrom_i = this->get_chrom_n();
+    s_note intv = SN(0, 0);
     /* if major mode, we say sharp three; else flat four */
     int fourths_count =
     (this->get_mode() == IONIAN || this->get_mode() == LYDIAN ||
     this->get_mode() == MIXOLYDIAN) ? 7 : 6;
     for(int i = 0; i < fourths_count; i++) {
-        if (c_note == chrom_i) {
-            fps = fps_i;
-            return intv_i;
+        if (cn == chrom_i) {
+            return intv;
         }
         chrom_i = (chrom_i + 7) % 12;
-        intv_i = (intv_i + 4) % 7;
-        if (intv_i == 3) {fps_i += 1;}
+        intv.n = (intv.n + 4) % 7;
+        if (intv.n == 3) {intv.fps += 1;}
     }
 /* It's none of those. Now check by thirds 3, b6, b2, b5, b8, b4.*/
     chrom_i = (this->get_chrom_n() + 5) % 12;
-    intv_i = 3;
-    fps_i = 0;
+    intv.n = 3;
+    intv.fps = 0;
     for (int i = 0; i < (12 - fourths_count); i++) {
-        if (c_note == chrom_i) {
-            fps = fps_i;
-            return intv_i;
+        if (cn == chrom_i) {
+            return intv;
         }
         chrom_i = (chrom_i + 5) % 12;
-        intv_i = (intv_i + 3) % 7;
-        if (intv_i == 6) {fps_i -= 1;}
+        intv.n = (intv.n + 3) % 7;
+        if (intv.n == 6) {intv.fps -= 1;}
     }
 /* we should have found a name by now */
     throw logic_error("Error in _chrom_construct");
 }
 
-int Key::get_mode() const
+mode_i Key::get_mode() const
 {
     return this->mode;
 }
@@ -306,7 +312,7 @@ int Key::get_mode() const
  * give any preference to the original notation. It will be as if the
  * Key was created given an E. Because of this, changing the mode of an
  * existing key probably isn't a good idea. */
-void Key::set_mode(int m, bool update)
+void Key::set_mode(mode_i m, bool update)
 {
     if (modal) {
         if (0 <= m && m < 7) {
@@ -331,39 +337,34 @@ void Key::set_mode(int m, bool update)
     }
 }
 
-int Key::get_chrom_n() const
+c_note Key::get_chrom_n() const
 {
     return this->chrom_n;
 }
 
-int Key::get_staff_n() const
+s_note Key::get_staff_n() const
 {
     return this->staff_n;
 }
 
-int Key::get_fps() const
-{
-    return this->fps;
-}
-
 void Key::_update_repr() {
     int m_flats = mode_flats(this->mode);
-    int key_flats = s_note_flats(this->staff_n, this->fps);
+    int key_flats = s_note_flats(this->staff_n);
 
     if (key_flats + m_flats > flatsharp_limit) {
-        this->staff_n = positive_modulo(this->staff_n - 1, 7);
-        if (this->staff_n == S_B || this->staff_n == S_E) {
-            this->fps += 1;
+        this->staff_n.n = positive_modulo(this->staff_n.n - 1, 7);
+        if (this->staff_n.n == S_B || this->staff_n.n == S_E) {
+            this->staff_n.fps += 1;
         } else {
-            this->fps += 2;
+            this->staff_n.fps += 2;
         }
         _update_repr(); // is it that bad?
     } else if (key_flats + m_flats < -flatsharp_limit) {
-        this->staff_n = positive_modulo(this->staff_n + 1, 7);
-        if (this->staff_n == S_F || this->staff_n == S_C) {
-            this->fps -= 1;
+        this->staff_n.n = positive_modulo(this->staff_n.n + 1, 7);
+        if (this->staff_n.n == S_F || this->staff_n.n == S_C) {
+            this->staff_n.fps -= 1;
         } else {
-            this->fps -= 2;
+            this->staff_n.fps -= 2;
         }
         _update_repr();
     }
@@ -371,7 +372,7 @@ void Key::_update_repr() {
 
 string Key::disp() const
 {
-    return s_fps_str(this->staff_n, this->fps);
+    return s_fps_str(this->staff_n);
 }
 
 string Key::disp_full() const
@@ -420,12 +421,13 @@ void Key::set_modal(bool m)
     modal = m;
 }
 
-Key key_from_sharps(int sharps, int mode)
+Key key_from_sharps(int sharps, mode_i mode)
 {
+    s_note staff_n;
     int major_sharps = sharps + mode_flats(mode);
-    int staff_n = positive_modulo(S_C - 3 * major_sharps, 7);
-    int fps = (major_sharps >= 0 ? 1 : -1) * ((abs(major_sharps - 2) + 3) / 7);
-    return Key(staff_n, fps, mode);
+    staff_n.n = positive_modulo(S_C - 3 * major_sharps, 7);
+    staff_n.fps = (major_sharps >= 0 ? 1 : -1) * ((abs(major_sharps - 2) + 3) / 7);
+    return Key(staff_n, mode);
 }
 
 /* Note functions */
@@ -440,7 +442,7 @@ Note::Note(int mn, Key k)
     _chrom_construct(mn, k);
 }
 
-Note::Note(int cn, int oct)
+Note::Note(c_note cn, int oct)
 {
     int mn = 0;
     if (cn > 11 || cn < 0) {
@@ -453,7 +455,7 @@ Note::Note(int cn, int oct)
     _chrom_construct(mn, Key("C"));
 }
 
-Note::Note(int cn, int oct, Key k)
+Note::Note(c_note cn, int oct, Key k)
 {
     int mn = 0;
     if (cn > 11 || cn < 0) {
@@ -476,22 +478,21 @@ void Note::_chrom_construct(int midi_n, Key k)
 {
     int chrom_n = midi_n % 12;
 /* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
-    int intv_fps;
-    int intv = k.interval_in_key(chrom_n, intv_fps);
+    s_note intv = k.interval_in_key(chrom_n);
     this->octave = (midi_n/12) - 1;
-    this->staff_n = add_intv(k.get_staff_n(), k.get_fps(), intv, intv_fps, this->fps);
+    this->staff_n = add_intv(k.get_staff_n(), intv);
 }
 
-Note::Note(int sn, int fs, int oct) : staff_n(sn), fps(fs), octave(oct)
+Note::Note(s_note sn, int oct) : staff_n(sn), octave(oct)
 {
 
 }
 
-Note::Note(Key k, int oct, int intv, int fs)
+Note::Note(Key k, int oct, s_note intv)
 {
-    int mn = (oct+1)*12 + k.get_chrom_n() + sintv_to_cintv(intv, fs);
+    int mn = (oct+1)*12 + k.get_chrom_n() + sintv_to_cintv(intv);
     this->octave = (mn/12) - 1;
-    this->staff_n = add_intv(k.get_staff_n(), k.get_fps(), intv, fs, this->fps);
+    this->staff_n = add_intv(k.get_staff_n(), intv);
 }
 
 Note Note::ctranspose(int c_intv)
@@ -502,64 +503,54 @@ Note Note::ctranspose(int c_intv)
 
 Note Note::ktranspose(Key k_orig, int c_intv)
 {
-    int intv_fs = 0;
-    int this_intv = get_intv(k_orig.get_staff_n(), k_orig.get_fps(), this->staff_n, this->fps, intv_fs);
-    int key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv, intv_fs) + c_intv) / 12 - 1;
-
-    return Note(Key(positive_modulo(k_orig.get_chrom_n() + c_intv, 12), k_orig.get_mode()), key_oct, this_intv, intv_fs);
+    s_note this_intv = get_intv(k_orig.get_staff_n(), this->staff_n);
+    int key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) + c_intv) / 12 - 1;
+    return Note(Key(positive_modulo(k_orig.get_chrom_n() + c_intv, 12), k_orig.get_mode()), key_oct, this_intv);
 }
 
 /* TODO: ensure that this works for negative intervals */
-Note Note::ktranspose(Key k_orig, int s_intv, int fs)
+Note Note::ktranspose(Key k_orig, s_note intv)
 {
-    int this_fs = 0;
-    int this_intv = get_intv(k_orig.get_staff_n(), k_orig.get_fps(), this->staff_n, this->fps, this_fs);
-    int new_key_oct = (get_midi_n() - sintv_to_cintv(this_intv, this_fs) + sintv_to_cintv(s_intv, fs)) / 12 -1;
-    int new_key_fs = 0;
-    int new_key_sn = add_intv(k_orig.get_staff_n(), k_orig.get_fps(), s_intv, fs, new_key_fs);
-    return Note(Key(new_key_sn, new_key_fs, k_orig.get_mode()), new_key_oct, this_intv, this_fs);
+    s_note this_intv = get_intv(k_orig.get_staff_n(), this->staff_n);
+    int new_key_oct = (get_midi_n() - sintv_to_cintv(this_intv) + sintv_to_cintv(intv)) / 12 -1;
+    s_note new_key_sn = add_intv(k_orig.get_staff_n(), intv);
+    return Note(Key(new_key_sn, k_orig.get_mode()), new_key_oct, this_intv);
 }
 
 Note Note::ktranspose(Key k_orig, Key k_dest, int which)
 {
-    int this_fs = 0;
-    int this_intv = get_intv(k_orig.get_staff_n(), k_orig.get_fps(), this->staff_n, this->fps, this_fs);
+    s_note this_intv = get_intv(k_orig.get_staff_n(), this->staff_n);
     int pos_dist = positive_modulo(k_dest.get_chrom_n() - k_orig.get_chrom_n(), 12);
     int new_key_oct;
     if (which > 0) {
-        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv, this_fs) + pos_dist) / 12 - 1 + (which - 1);
+        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) + pos_dist) / 12 - 1 + (which - 1);
     } else if (which < 0) {
-        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv, this_fs) - 12 + pos_dist) / 12 - 1 + (which + 1);
+        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) - 12 + pos_dist) / 12 - 1 + (which + 1);
     } else if (which == 0) {
-        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv, this_fs) +
+        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) +
             ((pos_dist <= 6) ? (pos_dist) : (-12 + pos_dist))) / 12 -1;
     }
-    return Note(k_dest, new_key_oct, this_intv, this_fs);
+    return Note(k_dest, new_key_oct, this_intv);
 }
 
 Key Note::to_key(int m)
 {
-    return Key(this->staff_n, this->fps, m);
+    return Key(this->staff_n, m);
 }
 
 int Note::get_midi_n() const
 {
-    return s_to_c(this->staff_n, this->fps) + 12*(this->octave + 1);
+    return s_to_c(this->staff_n) + 12*(this->octave + 1);
 }
 
-int Note::get_chrom_n() const
+c_note Note::get_chrom_n() const
 {
-    return s_to_c(this->staff_n, this->fps);
+    return s_to_c(this->staff_n);
 }
 
-int Note::get_staff_n() const
+s_note Note::get_staff_n() const
 {
     return this->staff_n;
-}
-
-int Note::get_fps() const
-{
-    return this->fps;
 }
 
 int Note::get_octave() const
@@ -569,7 +560,7 @@ int Note::get_octave() const
 
 string Note::disp() const
 {
-    return s_fps_str(this->staff_n, this->fps) + std::to_string(this->octave);
+    return s_fps_str(this->staff_n) + std::to_string(this->octave);
 }
 
 bool Note::operator<(const Note &Note2)
