@@ -128,6 +128,7 @@ public:
     set_flatsharp_limit. */
     Key(int sn, int fs, int m); // 7-note representation, and mode.
     Key(std::string n);        //string representation
+    int interval_in_key(int c_note, int &fps);
     int get_mode() const;
     /* if update_repr is true, set_mode rechecks the key signature
      * against the flat-sharp limit. */

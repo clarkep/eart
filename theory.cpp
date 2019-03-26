@@ -260,6 +260,41 @@ void Key::_staff_construct(int sn, int fs, int m)
     set_mode(m);
 }
 
+int Key::interval_in_key(int c_note, int &fps)
+{
+/* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
+    int chrom_i = this->get_chrom_n();
+    int intv_i = 0;
+    int fps_i = 0;
+    /* if major mode, we say sharp three; else flat four */
+    int fourths_count =
+    (this->get_mode() == IONIAN || this->get_mode() == LYDIAN ||
+    this->get_mode() == MIXOLYDIAN) ? 7 : 6;
+    for(int i = 0; i < fourths_count; i++) {
+        if (c_note == chrom_i) {
+            fps = fps_i;
+            return intv_i;
+        }
+        chrom_i = (chrom_i + 7) % 12;
+        intv_i = (intv_i + 4) % 7;
+        if (intv_i == 3) {fps_i += 1;}
+    }
+/* It's none of those. Now check by thirds 3, b6, b2, b5, b8, b4.*/
+    chrom_i = (this->get_chrom_n() + 5) % 12;
+    intv_i = 3;
+    fps_i = 0;
+    for (int i = 0; i < (12 - fourths_count); i++) {
+        if (c_note == chrom_i) {
+            fps = fps_i;
+            return intv_i;
+        }
+        chrom_i = (chrom_i + 5) % 12;
+        intv_i = (intv_i + 3) % 7;
+        if (intv_i == 6) {fps_i -= 1;}
+    }
+/* we should have found a name by now */
+    throw logic_error("Error in _chrom_construct");
+}
 
 int Key::get_mode() const
 {
@@ -441,39 +476,10 @@ void Note::_chrom_construct(int midi_n, Key k)
 {
     int chrom_n = midi_n % 12;
 /* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
-    int chrom_i = k.get_chrom_n();
-    int staff_i = k.get_staff_n();
-    int fps_i = k.get_fps();
-    /* if major mode, we say sharp three; else flat four */
-    int fourths_count =
-    (k.get_mode() == IONIAN || k.get_mode() == LYDIAN ||
-    k.get_mode() == MIXOLYDIAN) ? 7 : 6;
-    for(int i = 0; i < fourths_count; i++) {
-        if (chrom_n == chrom_i) {
-            this->staff_n = staff_i;
-            this->fps = fps_i;
-            return;
-        }
-        chrom_i = (chrom_i + 7) % 12;
-        staff_i = (staff_i + 4) % 7;
-        if (staff_i == S_F) {fps_i += 1;}
-    }
-/* It's none of those. Now check by thirds 3, b6, b2, b5, b8, b4.*/
-    chrom_i = (k.get_chrom_n() + 5) % 12;
-    staff_i = (k.get_staff_n() + 3) % 7;
-    fps_i = (staff_i == S_B) ? k.get_fps() + 1 : k.get_fps();
-    for (int i = 0; i < (12 - fourths_count); i++) {
-        if (chrom_n == chrom_i) {
-            this->staff_n = staff_i;
-            this->fps = fps_i;
-            return;
-        }
-        chrom_i = (chrom_i + 5) % 12;
-        staff_i = (staff_i + 3) % 7;
-        if (staff_i == S_B) {fps_i -= 1;}
-    }
-/* we should have found a name by now */
-    throw logic_error("Error in _chrom_construct");
+    int intv_fps;
+    int intv = k.interval_in_key(chrom_n, intv_fps);
+    this->octave = (midi_n/12) - 1;
+    this->staff_n = add_intv(k.get_staff_n(), k.get_fps(), intv, intv_fps, this->fps);
 }
 
 Note::Note(int sn, int fs, int oct) : staff_n(sn), fps(fs), octave(oct)
