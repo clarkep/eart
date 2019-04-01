@@ -214,6 +214,31 @@ s_note resolve_chromatic(c_note cn, mode_i mode)
     return ret;
 }
 
+s_note enharm(s_note orig, int direction)
+{
+    s_note ret = orig;
+    if (direction > 0) {
+        for (int i = 0; i < direction; i++) {
+            ret.n = positive_modulo(ret.n + 1, 7);
+            if ((ret.n == S_F) || (ret.n == S_C)) {
+                ret.fps -= 1;
+            } else {
+                ret.fps -= 2;
+            }
+        }
+    } else {
+        for (int i = 0; i < abs(direction); i++) {
+            ret.n = positive_modulo(ret.n - 1, 7);
+            if ((ret.n == S_E) || (ret.n == S_B)) {
+                ret.fps += 1;
+            } else {
+                ret.fps += 2;
+            }
+        }
+    }
+    return ret;
+}
+
 int Key::flatsharp_limit = FLAT_SHARP_LIMIT;
 bool Key::modal = MODAL;
 
@@ -352,20 +377,10 @@ void Key::_update_repr() {
     int key_flats = s_note_flats(this->staff_n);
 
     if (key_flats + m_flats > flatsharp_limit) {
-        this->staff_n.n = positive_modulo(this->staff_n.n - 1, 7);
-        if (this->staff_n.n == S_B || this->staff_n.n == S_E) {
-            this->staff_n.fps += 1;
-        } else {
-            this->staff_n.fps += 2;
-        }
+        this->staff_n = enharm(this->staff_n, -1);
         _update_repr(); // is it that bad?
     } else if (key_flats + m_flats < -flatsharp_limit) {
-        this->staff_n.n = positive_modulo(this->staff_n.n + 1, 7);
-        if (this->staff_n.n == S_F || this->staff_n.n == S_C) {
-            this->staff_n.fps -= 1;
-        } else {
-            this->staff_n.fps -= 2;
-        }
+        this->staff_n = enharm(this->staff_n, 1);
         _update_repr();
     }
 }

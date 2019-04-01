@@ -106,6 +106,8 @@ c_note s_to_c(s_note note);
 c_note sintv_to_cintv(s_note sintv);
 s_note resolve_chromatic(c_note cn, mode_i mode);
 
+s_note enharm(int direction);
+
 /*
  * A Key represents one of the 12 equal tempered notes from
  * the perspective that the note is the key center of some
