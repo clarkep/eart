@@ -41,6 +41,10 @@ int positive_modulo(int i, int n) {
     return tmp ? i >= 0 ? tmp : tmp + n : 0;
 }
 
+int floor_divide(int x, int y) {
+    return x >= 0 ? x / y : (x/y) - 1;
+}
+
 string s_note_str(int s)
 {
     s = s % 7;
@@ -537,14 +541,7 @@ Note Note::ktranspose(Key k_orig, Key k_dest, int which)
     s_note this_intv = get_intv(k_orig.get_staff_n(), this->staff_n);
     int pos_dist = positive_modulo(k_dest.get_chrom_n() - k_orig.get_chrom_n(), 12);
     int new_key_oct;
-    if (which > 0) {
-        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) + pos_dist) / 12 - 1 + (which - 1);
-    } else if (which < 0) {
-        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) - 12 + pos_dist) / 12 - 1 + (which + 1);
-    } else if (which == 0) {
-        new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) +
-            ((pos_dist <= 6) ? (pos_dist) : (-12 + pos_dist))) / 12 -1;
-    }
+    new_key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) + pos_dist) / 12 - 1 + (which);
     return Note(k_dest, new_key_oct, this_intv);
 }
 
@@ -586,4 +583,14 @@ bool Note::operator<(const Note &Note2)
 bool Note::operator>(const Note &Note2)
 {
     return this->get_midi_n() > Note2.get_midi_n();
+}
+
+string chord_string(vector<Note> *chord)
+{
+    string ret = "{" + chord->at(0).disp();
+    for (int i = 1; i < chord->size(); i++) {
+        ret = ret + ", " + chord->at(i).disp();
+    }
+    ret = ret + "}";
+    return ret;
 }

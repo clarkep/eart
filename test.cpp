@@ -487,10 +487,10 @@ int test_note_ktranspose()
     assert (s_note_eq(m.get_staff_n(), SN(S_D, -2)));
     assert (m.get_midi_n() == 36);
     assert (m.get_octave() == 2);
-    m = m.ktranspose(Key("Gb"), Key("A"), 1);
+    m = m.ktranspose(Key("Gb"), Key("A"), 0);
     assert (s_note_eq(m.get_staff_n(), SN(S_E, -1)));
     assert (m.get_midi_n() == 39);
-    m = m.ktranspose(Key("A"), Key("B"), 2);
+    m = m.ktranspose(Key("A"), Key("B"), 1);
     assert (s_note_eq(m.get_staff_n(), SN(S_F, 0)));
     assert (m.get_midi_n() == 53);
 
@@ -499,19 +499,22 @@ int test_note_ktranspose()
 }
 
 /* tests for functions in the file quiz.cpp */
-
+// TODO: I tested a few edge cases, but needs more and consistent tests. 
 int man_test_transpose_q()
 {
+    int seed = 1234;
+    srand(seed);
     NoteSynth synth = NoteSynth();
-    vector<Note> chord{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4), Note(C_B, 4)}; //Cmaj7
-    for (int n=0; n < 100; n++) {
-    ChordQItem res = transpose_q(chord, 30, 88, "maj7", 7, false);
-    //for (int i=0; i < res.notevec.size(); i++) {
-    //    cout << res.notevec[i].disp() << " " << res.notevec[i].get_midi_n() << endl;
-    //}
-    cout << res.name << endl;
-    synth.play_chord(res.notevec);
-}
+    vector<Note> chord{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4)}; //Cmaj
+    for (int n=0; n < 10; n++) {
+        ChordQItem res = transpose_q(&chord, 48, 68, "maj", 7, true);
+        //for (int i=0; i < res.notevec.size(); i++) {
+        //    cout << res.notevec[i].disp() << " " << res.notevec[i].get_midi_n() << endl;
+        //}
+        cout << res.name << endl;
+        cout << chord_string(&res.notevec) << endl;
+        synth.play_chord(res.notevec);
+    }
 }
 
 int test_free_functions()
@@ -554,14 +557,18 @@ int test_note()
 
 int test_misc()
 {
-
+    srand(134);
+    vector<int> *p = randints(0, 5);
+    for (int i = 0; i < 5; i++) {
+        cout << p->at(i) << endl;
+    }
 }
 
 int main(int argc, char** argv)
 {
-    //man_test_transpose_q();
+    man_test_transpose_q();
 
-    test_misc();
+    //test_misc();
     test_free_functions();
     test_key();
     test_note();

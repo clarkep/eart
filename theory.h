@@ -25,6 +25,7 @@
 #define __THEORY_H_INCLUDED__
 
 #include <string>
+#include <vector>
 
 #define FLAT_SHARP_LIMIT 7
 #define MODAL 0
@@ -81,6 +82,7 @@ typedef int mode_i;
 bool s_note_eq(s_note a, s_note b);
 
 int positive_modulo(int i, int n);
+int floor_divide(int x, int y);
 
 /* string representations of note and mode ints */
 std::string c_note_str(c_note c);
@@ -112,8 +114,7 @@ s_note enharm(int direction);
  * A Key represents one of the 12 equal tempered notes from
  * the perspective that the note is the key center of some
  * music. It doesn't have an octave, but it does have a
- * mode, which is only used to determine how to notate the Key(e.g. to
- * choose between C# and Db). Keys should be used to specify harmonic
+ * mode. Keys should be used to specify harmonic
  * centers- for example, the roots of the chords to a song.
  *
  * If modal is set to false, which it is by default, the Key can only
@@ -199,9 +200,9 @@ public:
        with the least flats/sharps. */
     Note ktranspose(Key k_orig, c_note c_intv);
     Note ktranspose(Key k_orig, s_note sintv);
-    /* transpose to the new Key k. If which is 1, tranpose up to the nearest
-       octave, if its 2, transpose an octave obove that, etc. Same for negatives.
-       If which is 0, simply tranpose to the nearest instancec of k */
+    /* transpose to the new Key k. If which is 0, tranpose up to the nearest
+       octave, if its 1, transpose an octave obove that, etc. If which is -1, transpose
+       down to the nearest octave, if -2, an octave below that, etc */
     Note ktranspose(Key k_orig, Key k_dest, int which=0);
     // return the key centered on this note's value. m is the mode of the new Key.
     Key to_key(int m);
@@ -217,5 +218,9 @@ private:
     s_note staff_n;
     int octave;
 };
+
+/* chords can be represented as vectors of notes */
+std::string chord_string(std::vector<Note> *chord);
+
 
 #endif
