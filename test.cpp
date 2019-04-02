@@ -30,6 +30,7 @@ bool streams_equal(istream *stream1, istream *stream2)
 
 /* functions in theory.h */
 int test_tfs() {
+    cout << "Testing thirds_from_six...";
     assert (thirds_from_six(6) == 0);
     assert (thirds_from_six(2) == 1);
     assert (thirds_from_six(5) == 2);
@@ -37,50 +38,54 @@ int test_tfs() {
     assert (thirds_from_six(4) == 4);
     assert (thirds_from_six(0) == 5);
     assert (thirds_from_six(3) == 6);
+    cout << "Passed." << endl;
     return 0;
 }
 
 int test_add_intv()
 {
-  s_note res;
-  res = add_intv(SN(S_E, -1), SN(1, 0));
-  assert (res.n == S_F);
-  assert (res.fps == 0);
-  res = add_intv(SN(S_E, 0), SN(12, -2));
-  assert (res.n == S_C);
-  assert (res.fps == -1);
-  res = add_intv(SN(S_F, 0), SN(6, -2));
-  assert (res.n == S_E);
-  assert (res.fps == -2);
-  res = add_intv(SN(S_B, 0), SN(10, 0));
-  assert (res.n == S_E);
-  assert (res.fps == 0);
-  res = add_intv(SN(S_B, -1), SN(6, 2));
-  assert (res.n == S_A);
-  assert (res.fps == 2);
-  res = add_intv(SN(S_A, -1), SN(2, -2));
-  assert (res.n == S_C);
-  assert (res.fps == -2);
-  res = add_intv(SN(S_E, -2), SN(8, 1));
-  assert (res.n == S_F);
-  assert (res.fps == 0);
-  res = add_intv(SN(S_D, 0), SN(-3, 0));
-  assert (res.n == S_A);
-  assert (res.fps == 0);
-  res = add_intv(SN(S_F, 1), SN(-5, 0));
-  assert (res.n == S_A);
-  assert (res.fps == 1);
-  res = add_intv(SN(S_G, -1), SN(-5, 0));
-  assert (res.n == S_B);
-  assert (res.fps == -1);
-  res = add_intv(SN(S_C, -1), SN(-1, 1));
-  assert (res.n == S_B);
-  assert (res.fps == 0);
-  return 0;
+    cout << "Testing add_intv...";
+    s_note res;
+    res = add_intv(SN(S_E, -1), SN(1, 0));
+    assert (res.n == S_F);
+    assert (res.fps == 0);
+    res = add_intv(SN(S_E, 0), SN(12, -2));
+    assert (res.n == S_C);
+    assert (res.fps == -1);
+    res = add_intv(SN(S_F, 0), SN(6, -2));
+    assert (res.n == S_E);
+    assert (res.fps == -2);
+    res = add_intv(SN(S_B, 0), SN(10, 0));
+    assert (res.n == S_E);
+    assert (res.fps == 0);
+    res = add_intv(SN(S_B, -1), SN(6, 2));
+    assert (res.n == S_A);
+    assert (res.fps == 2);
+    res = add_intv(SN(S_A, -1), SN(2, -2));
+    assert (res.n == S_C);
+    assert (res.fps == -2);
+    res = add_intv(SN(S_E, -2), SN(8, 1));
+    assert (res.n == S_F);
+    assert (res.fps == 0);
+    res = add_intv(SN(S_D, 0), SN(-3, 0));
+    assert (res.n == S_A);
+    assert (res.fps == 0);
+    res = add_intv(SN(S_F, 1), SN(-5, 0));
+    assert (res.n == S_A);
+    assert (res.fps == 1);
+    res = add_intv(SN(S_G, -1), SN(-5, 0));
+    assert (res.n == S_B);
+    assert (res.fps == -1);
+    res = add_intv(SN(S_C, -1), SN(-1, 1));
+    assert (res.n == S_B);
+    assert (res.fps == 0);
+    cout << "Passed." << endl;
+    return 0;
 }
 
 int test_get_intv()
 {
+    cout << "Testing get_intv...";
     s_note res;
     res = get_intv(SN(S_C, 1), SN(S_B, 0));
     assert (res.n == 6);
@@ -103,11 +108,13 @@ int test_get_intv()
     res = get_intv(SN(S_D, 2), SN(S_B, -1));
     assert (res.n == 5);
     assert (res.fps == -3);
+    cout << "Passed." << endl;
     return 0;
 }
 
 int test_mode_flats()
 {
+    cout << "Testing mode_flats...";
     assert (mode_flats(LYDIAN) == -1);
     assert (mode_flats(IONIAN) == 0);
     assert (mode_flats(MIXOLYDIAN) == 1);
@@ -118,21 +125,25 @@ int test_mode_flats()
 
     assert (mode_flats(MAJOR) == 0);
     assert (mode_flats(MINOR) == 3);
+    cout << "Passed." << endl;
     return 0;
 }
 
 int test_s_note_flats()
 {
+    cout << "Testing s_note_flats...";
     assert (s_note_flats(SN(S_C, 0)) == 0);
     assert (s_note_flats(SN(S_B, 0)) == -5);
     assert (s_note_flats(SN(S_B, -1)) == 2);
     assert (s_note_flats(SN(S_F, 1)) == -6);
     assert (s_note_flats(SN(S_A, 1)) == -10);
     assert (s_note_flats(SN(S_D, -2)) == 12);
+    cout << "Passed." << endl;
     return 0;
 }
 
 int test_s_to_c() { //and sintv_to_cintv
+    cout << "Testing s_to_c and sintv_to_cintv...";
     assert (s_to_c(SN(S_A, 0)) == C_A);
     assert (s_to_c(SN(S_A, 1)) == C_A_SHARP);
     assert (s_to_c(SN(S_A, 2)) == C_B);
@@ -147,11 +158,13 @@ int test_s_to_c() { //and sintv_to_cintv
     assert (sintv_to_cintv(SN(-8, 0)) == -13);
     assert (sintv_to_cintv(SN(-4, -1)) == -8);
     assert (sintv_to_cintv(SN(-5, -1)) == -9);
+    cout << "Passed." << endl;
     return 0;
 }
 
 int test_resolve_chromatic()
 {
+    cout << "Testing resolve_chromatic...";
     s_note res;
     res = resolve_chromatic(C_C, IONIAN);
     assert (res.n == S_C);
@@ -203,12 +216,14 @@ int test_resolve_chromatic()
     res = resolve_chromatic(C_C_SHARP, DORIAN);
     assert (res.n == S_C);
     assert (res.fps = 1);
+    cout << "Passed." << endl;
     return 0;
 }
 
 /* tests for the Key class */
 
 int test_key_chrom_constructor() {
+    cout << "Testing chromatic constructor..." << endl;
     ostringstream out;
     for (int i = 0; i < 12; i++) {
         Key k(i, MAJOR);
@@ -229,9 +244,11 @@ int test_key_chrom_constructor() {
     istringstream stream1(out.str());
     ifstream stream2("testing/chrom_constructor.txt");
     assert(streams_equal(&stream1, &stream2));
+    cout << "Passed." << endl;
 }
 
 int test_key_staff_constructor() {
+    cout << "Testing staff constructor..." << endl;
     /* this was messed with during the change to s_note, might need a rewrite*/
     ostringstream out;
     /* flats */
@@ -269,9 +286,11 @@ int test_key_staff_constructor() {
     istringstream stream1(out.str());
     ifstream stream2("testing/staff_constructor.txt");
     assert (streams_equal(&stream1, &stream2));
+    cout << "Passed." << endl;
 }
 
 int test_key_text_constructor() {
+    cout << "Testing text constructor..." << endl;
     ostringstream out;
     Key::set_modal(false);
     Key k("B");
@@ -286,10 +305,13 @@ int test_key_text_constructor() {
     istringstream stream1(out.str());
     ifstream stream2("testing/text_constructor.txt");
     assert (streams_equal(&stream1, &stream2));
+    cout << "Passed." << endl;
+    return 0;
 }
 
 int test_key_from_sharps()
 {
+    cout << "Testing key_from_sharps..." << endl;
     Key::set_modal(true);
     Key::set_flatsharp_limit(20);
     Key k = key_from_sharps(2, LYDIAN);
@@ -303,6 +325,9 @@ int test_key_from_sharps()
     assert (k.get_mode() == LYDIAN);
     k = key_from_sharps(-15, MAJOR);
     assert (s_note_eq(k.get_staff_n(), SN(S_F, -2)));
+
+    cout << "Passed." << endl;
+    return 0;
 }
 
 int test_key_misc()
@@ -314,6 +339,7 @@ int test_key_misc()
 
 int test_note_chrom_constructor()
 {
+    cout << "Testing chromatic constructor..." << endl;
     Key::set_modal(true);
     Key::set_flatsharp_limit(11);
     Note n = Note(70);
@@ -350,12 +376,15 @@ int test_note_chrom_constructor()
     n = Note(C_A, 0, Key(SN(S_E, -1), DORIAN));
     assert (n.get_midi_n() == 21);
     assert (s_note_eq(n.get_staff_n(), SN(S_B, -2)));
+
+    cout << "Passed." << endl;
     return 0;
     /* edge cases */
 }
 
 int test_note_staff_constructor()
 {
+    cout << "Testing staff constructor..." << endl;
     Key::set_modal(true);
     Note n = Note(SN(S_C, -1), 4);
     assert (n.get_midi_n() == 71);
@@ -371,10 +400,14 @@ int test_note_staff_constructor()
     assert (n.get_chrom_n() == C_B);
     assert (n.get_octave() == 0);
     //n = Note(S_B, 1, -1);
+
+    cout << "Passed." << endl;
+    return 0;
 }
 
 int test_note_intv_constructor()
 {
+    cout << "Testing interval constructor..." << endl;
     /* random tests */
     Key::set_modal(true);
     Note n = Note(Key("C"), 4, SN(4, 1));
@@ -403,23 +436,29 @@ int test_note_intv_constructor()
     assert (n.get_midi_n() == 84);
     assert (n.get_chrom_n() == C_C);
     assert (n.get_octave() == 6);
+
+    cout << "Passed." << endl;
     return 0;
 }
 
 int test_note_ctranspose()
 {
-  Note n = Note(120);
-  n = n.ctranspose(7);
-  assert (n.get_midi_n() == 127);
-  assert (s_note_eq(n.get_staff_n(), SN(S_G, 0)));
-  n = n.ctranspose(-13);
-  assert (n.get_midi_n() == 114);
-  assert (s_note_eq(n.get_staff_n(), SN(S_F, 1)));
-  return 0;
+    cout << "Testing chromatic transpose..." << endl;
+    Note n = Note(120);
+    n = n.ctranspose(7);
+    assert (n.get_midi_n() == 127);
+    assert (s_note_eq(n.get_staff_n(), SN(S_G, 0)));
+    n = n.ctranspose(-13);
+    assert (n.get_midi_n() == 114);
+    assert (s_note_eq(n.get_staff_n(), SN(S_F, 1)));
+
+    cout << "Passed." << endl;
+    return 0;
 }
 
 int test_note_ktranspose()
 {
+    cout << "Testing key transpose..." << endl;
     Key::set_flatsharp_limit(9);
     Note n = Note(Key("C"), 6, SN(2, 0));
     assert (s_note_eq(n.get_staff_n(), SN(S_E, 0)));
@@ -454,6 +493,9 @@ int test_note_ktranspose()
     m = m.ktranspose(Key("A"), Key("B"), 2);
     assert (s_note_eq(m.get_staff_n(), SN(S_F, 0)));
     assert (m.get_midi_n() == 53);
+
+    cout << "Passed." << endl;
+    return 0;
 }
 
 /* tests for functions in the file quiz.cpp */
@@ -477,27 +519,13 @@ int test_free_functions()
     cout << "----------------------------------------------------------------" << endl;
     cout << "Testing theory.cpp helper functions" << endl;
     cout << "----------------------------------------------------------------" << endl << endl;
-    cout << "Testing thirds_from_six...";
     test_tfs();
-    cout << "passed." << endl;
-    cout << "Testing add_intv...";
     test_add_intv();
-    cout << "passed." << endl;
-    cout << "Testing get_intv...";
     test_get_intv();
-    cout << "passed." << endl;
-    cout << "Testing mode_flats...";
     test_mode_flats();
-    cout << "passed." << endl;
-    cout << "Testing s_note_flats...";
     test_s_note_flats();
-    cout << "passed." << endl;
-    cout << "Testing s_to_c and sintv_to_cintv...";
     test_s_to_c();
-    cout << "passed." << endl;
-    cout << "Testing resolve_chromatic...";
     test_resolve_chromatic();
-    cout << "passed." << endl << endl;
 }
 
 int test_key()
@@ -505,18 +533,10 @@ int test_key()
     cout << "----------------------------------------------------------------" << endl;
     cout << "Testing Key class methods" << endl;
     cout << "----------------------------------------------------------------" << endl << endl;
-    cout << "Testing chromatic constructor..." << endl;
     test_key_chrom_constructor();
-    cout << endl << "Test passed. ";
-    cout << "Testing staff constructor..." << endl;
     test_key_staff_constructor();
-    cout << endl << "Test passed. ";
-    cout << "Testing text constructor..." << endl;
     test_key_text_constructor();
-    cout << "Test passed." << endl;
-    cout << "Testing key_from_sharps..." << endl;
     test_key_from_sharps();
-    cout << "Test passed." << endl << endl;
 }
 
 int test_note()
@@ -524,23 +544,12 @@ int test_note()
     cout << "----------------------------------------------------------------" << endl;
     cout << "Testing Note class methods" << endl;
     cout << "----------------------------------------------------------------" << endl << endl;
-    cout << "Testing chromatic constructor..." << endl;
     test_note_chrom_constructor();
-    cout << endl << "Test passed. ";
-    cout << "Testing staff constructor..." << endl;
     test_note_staff_constructor();
-    cout << endl << "Test passed. ";
-    cout << "Testing interval constructor..." << endl;
     test_note_intv_constructor();
-    cout << endl << "Test passed. ";
-    cout << "Testing chromatic transpose..." << endl;
     test_note_ctranspose();
-    cout << endl << "Test passed. ";
-    cout << "Testing key transpose..." << endl;
     test_note_ktranspose();
-    cout << "Test passed." << endl << endl;
 }
-
 
 
 int test_misc()
@@ -559,5 +568,4 @@ int main(int argc, char** argv)
 
     cout << "----------------------------------------------------------------" << endl;
     cout << "All tests passed.\n";
-
 }
