@@ -68,12 +68,12 @@ ChordQItem transpose_q(std::vector<Note> *chord, int min_mn, int max_mn,
     }
 
     ChordQItem result;
-    vector<Note> new_chord;
+    vector<Note> *new_chord = new vector<Note>();
     for (int i = 0; i < chord->size(); i++) {
         Note n = chord->at(i).ktranspose(Key("C"), k1, octave);
-        new_chord.push_back(n);
+        new_chord->push_back(n);
     }
-    Note new_low_note = *min_element(new_chord.begin(), new_chord.end());
+    Note new_low_note = *min_element(new_chord->begin(), new_chord->end());
     string chord_name = k1.disp() + suffix +
       (show_lowest ? ("(low=" + new_low_note.disp() + ")") : "");
     result.notevec = new_chord;
@@ -121,14 +121,14 @@ ChordQItem major_triad_quiz()
     Key k = root.to_key(MAJOR);
     int oct =  root.get_octave();
 
-    vector<Note> notes;
+    vector<Note> *notes = new vector<Note>();
     for(int i = 0; i < 3; i++)
     {
         Note n = Note(k, oct, SN(2*i, 0));
         if (inv > i) {
             n = n.ctranspose(12);
         }
-        notes.push_back(n);
+        notes->push_back(n);
     }
     ChordQItem ret;
     ret.notevec = notes;

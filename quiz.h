@@ -16,7 +16,7 @@
 std::vector<int> *randints(int start, int stop);
 
 struct ChordQItem {
-    std::vector<Note> notevec;
+    std::vector<Note> *notevec;
     std::string name;
 };
 

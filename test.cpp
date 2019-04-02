@@ -499,7 +499,7 @@ int test_note_ktranspose()
 }
 
 /* tests for functions in the file quiz.cpp */
-// TODO: I tested a few edge cases, but needs more and consistent tests. 
+// TODO: I tested a few edge cases, but needs more and consistent tests.
 int man_test_transpose_q()
 {
     int seed = 1234;
@@ -512,7 +512,7 @@ int man_test_transpose_q()
         //    cout << res.notevec[i].disp() << " " << res.notevec[i].get_midi_n() << endl;
         //}
         cout << res.name << endl;
-        cout << chord_string(&res.notevec) << endl;
+        cout << chord_string(res.notevec) << endl;
         synth.play_chord(res.notevec);
     }
 }

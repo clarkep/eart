@@ -42,17 +42,17 @@ void NoteSynth::note_off(Note n)
     fluid_synth_noteoff(synth, 0, n.get_midi_n());
 }
 
-void NoteSynth::chord_on(vector<Note> notevec)
+void NoteSynth::chord_on(vector<Note> *notevec)
 {
-    for (int i = 0; i < notevec.size(); i++) {
-        note_on(notevec[i]);
+    for (int i = 0; i < notevec->size(); i++) {
+        note_on(notevec->at(i));
     }
 }
 
-void NoteSynth::chord_off(vector<Note> notevec)
+void NoteSynth::chord_off(vector<Note> *notevec)
 {
-    for (int i = 0; i < notevec.size(); i++) {
-        note_off(notevec[i]);
+    for (int i = 0; i < notevec->size(); i++) {
+        note_off(notevec->at(i));
     }
 }
 
@@ -64,16 +64,16 @@ void NoteSynth::play_note(Note n)
     fluid_synth_noteoff(synth, 0, midi_n);
 }
 
-void NoteSynth::play_chord(vector<Note> notevec)
+void NoteSynth::play_chord(vector<Note> *notevec)
 {
     int midi_n = 0;
-    for (int i = 0; i < notevec.size(); i++) {
-        midi_n = notevec[i].get_midi_n();
+    for (int i = 0; i < notevec->size(); i++) {
+        midi_n = notevec->at(i).get_midi_n();
         fluid_synth_noteon(synth, 0, midi_n, 127);
     }
     sleep(SUSTAIN_TIME);
-    for (int i = 0; i < notevec.size(); i++) {
-        midi_n = notevec[i].get_midi_n();
+    for (int i = 0; i < notevec->size(); i++) {
+        midi_n = notevec->at(i).get_midi_n();
         fluid_synth_noteoff(synth, 0, midi_n);
     }
 }

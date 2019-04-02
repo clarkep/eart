@@ -587,6 +587,9 @@ bool Note::operator>(const Note &Note2)
 
 string chord_string(vector<Note> *chord)
 {
+    if (chord->size() == 0) {
+        return "{}";
+    }
     string ret = "{" + chord->at(0).disp();
     for (int i = 1; i < chord->size(); i++) {
         ret = ret + ", " + chord->at(i).disp();
