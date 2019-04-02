@@ -66,14 +66,7 @@ void NoteSynth::play_note(Note n)
 
 void NoteSynth::play_chord(vector<Note> *notevec)
 {
-    int midi_n = 0;
-    for (int i = 0; i < notevec->size(); i++) {
-        midi_n = notevec->at(i).get_midi_n();
-        fluid_synth_noteon(synth, 0, midi_n, 127);
-    }
+    chord_on(notevec);
     sleep(SUSTAIN_TIME);
-    for (int i = 0; i < notevec->size(); i++) {
-        midi_n = notevec->at(i).get_midi_n();
-        fluid_synth_noteoff(synth, 0, midi_n);
-    }
+    chord_off(notevec);
 }
