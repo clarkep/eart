@@ -502,12 +502,12 @@ int test_note_ktranspose()
 // TODO: I tested a few edge cases, but needs more and consistent tests.
 int man_test_transpose_q()
 {
-    int seed = 1234;
+    int seed = 1340;
     srand(seed);
     NoteSynth synth = NoteSynth();
-    vector<Note> chord{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4)}; //Cmaj
+    vector<Note> chord{Note(C_D, 3), Note(C_F, 3), Note(C_A, 3)}; //Cmaj
     for (int n=0; n < 10; n++) {
-        ChordQItem res = transpose_q(&chord, 48, 68, "maj", 7, true);
+        ChordQItem res = transpose_q(&chord, 50, 59, "min", Key("Dm"), 6, true);
         //for (int i=0; i < res.notevec.size(); i++) {
         //    cout << res.notevec[i].disp() << " " << res.notevec[i].get_midi_n() << endl;
         //}

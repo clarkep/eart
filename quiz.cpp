@@ -33,44 +33,52 @@ int randint(int min, int max)
 
 // TODO: refactor so that each key has an equal chance of being selected, instead of each note.
 ChordQItem transpose_q(std::vector<Note> *chord, int min_mn, int max_mn,
-                      string suffix, int flatsharp_limit, bool show_lowest)
+                      string suffix, Key k, int flatsharp_limit, bool show_lowest)
 {
-    int old_flatsharp_limit = Key::get_flatsharp_limit();
-    Key::set_flatsharp_limit(max(6, flatsharp_limit));
+    int fs_limit, old_flatsharp_limit;
+    if (flatsharp_limit < 0) {
+        fs_limit = Key::get_flatsharp_limit();
+    } else {
+        fs_limit = flatsharp_limit;
+        old_flatsharp_limit = Key::get_flatsharp_limit();
+        Key::set_flatsharp_limit(max(6, flatsharp_limit));
+    }
 
     Note top = *max_element(chord->begin(), chord->end());
     Note bottom = *min_element(chord->begin(), chord->end());
-    if ((top.get_midi_n() >= max_mn) || (bottom.get_midi_n() < min_mn)) {
-        throw logic_error("transpose_q: input chord must be in range [min_mn, max_mn).");
-    }
     int uprange = max_mn - top.get_midi_n();
     int downrange = bottom.get_midi_n() - min_mn;
 
-    vector<int> *keys = randints(-flatsharp_limit, flatsharp_limit+1);
-    Key k1 = key_from_sharps(keys->back(), MAJOR);
+    vector<int> *keys = randints(-fs_limit, fs_limit+1);
+    Key k1 = key_from_sharps(keys->back(), k.get_mode());
     int octave;
     keys->pop_back();
     bool key_works = false;
     while (!key_works) {
-        int up_cintv = k1.get_chrom_n();
+        int up_cintv = positive_modulo(k1.get_chrom_n() - k.get_chrom_n(), 12);
         int up_octaves = uprange/12 + ((uprange % 12) > up_cintv ? 1 : 0);
         int down_cintv = 12 - up_cintv;
         int down_octaves = downrange/12 + ((downrange % 12) >= down_cintv ? 1 : 0);
 
-        if (up_octaves + down_octaves)
+        if (up_octaves || down_octaves)
         {
             key_works = true;
             octave = randint(-down_octaves, up_octaves);
         } else {
-            k1 = key_from_sharps(keys->back(), MAJOR);
-            keys->pop_back();
+            if (keys->size()) {
+                k1 = key_from_sharps(keys->back(), k.get_mode());
+                keys->pop_back();
+            } else {
+                throw logic_error("transpose_q: no possibilities with given"
+                    " range [min_mn, max) and flatsharp_limit");
+            }
         }
     }
 
     ChordQItem result;
     vector<Note> *new_chord = new vector<Note>();
     for (int i = 0; i < chord->size(); i++) {
-        Note n = chord->at(i).ktranspose(Key("C"), k1, octave);
+        Note n = chord->at(i).ktranspose(k, k1, octave);
         new_chord->push_back(n);
     }
     Note new_low_note = *min_element(new_chord->begin(), new_chord->end());
@@ -79,7 +87,9 @@ ChordQItem transpose_q(std::vector<Note> *chord, int min_mn, int max_mn,
     result.notevec = new_chord;
     result.name = chord_name;
 
-    Key::set_flatsharp_limit(old_flatsharp_limit);
+    if (flatsharp_limit != -1) {
+        Key::set_flatsharp_limit(old_flatsharp_limit);
+    }
     return result;
 }
 
