@@ -109,9 +109,6 @@ string c_note_str(c_note c) {
 }
 
 string mode_str(mode_i m) {
-    if (m == MINOR) {
-        return "Minor";
-    }
     m = positive_modulo(m, 7);
     string r = "";
     switch (m) {
@@ -167,9 +164,6 @@ s_note get_intv(s_note lower, s_note upper)
 
 int mode_flats(mode_i mode)
 {
-    if (mode == MINOR) {
-        mode = AEOLIAN;
-    }
     return 5 - thirds_from_six(mode);
 }
 
@@ -298,7 +292,7 @@ void Key::_staff_construct(s_note sn, mode_i m)
     set_mode(m);
 }
 
-s_note Key::interval_in_key(c_note cn)
+s_note Key::interpret_in_key(c_note cn)
 {
 /* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
     c_note chrom_i = this->get_chrom_n();
@@ -331,6 +325,16 @@ s_note Key::interval_in_key(c_note cn)
     throw logic_error("Error in _chrom_construct");
 }
 
+Key Key::interval_key(s_note intv, mode_i m)
+{
+    return Key(add_intv(this->staff_n, intv), m);
+}
+
+Note Key::interval_note(int octave, s_note intv)
+{
+    return Note(*this, octave, intv);
+}
+
 mode_i Key::get_mode() const
 {
     return this->mode;
@@ -346,16 +350,12 @@ void Key::set_mode(mode_i m, bool update)
     if (modal) {
         if (0 <= m && m < 7) {
             this->mode = m;
-        } else if (m == MINOR) {
-            this->mode = AEOLIAN;
         } else {
             throw logic_error("Invalid mode");
         }
     } else {
-        if (m == MINOR || m == MAJOR) {
+        if (m == MAJOR || m == MINOR) {
             this->mode = m;
-        } else if (m == AEOLIAN) {
-            this->mode = MINOR; //we're not that fancy :)
         } else {
             throw logic_error(
             "Invalid mode(modal is false, so mode must be major or minor)");
@@ -403,7 +403,7 @@ string Key::disp_full() const
     } else {
         if (mode == MAJOR) {
             ret.append("Major");
-        } else if (mode == MINOR || mode == AEOLIAN) {
+        } else if (mode == MINOR) {
             ret.append("Minor");
         }
     }
@@ -497,7 +497,7 @@ void Note::_chrom_construct(int midi_n, Key k)
 {
     int chrom_n = midi_n % 12;
 /* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
-    s_note intv = k.interval_in_key(chrom_n);
+    s_note intv = k.interpret_in_key(chrom_n);
     this->octave = (midi_n/12) - 1;
     this->staff_n = add_intv(k.get_staff_n(), intv);
 }

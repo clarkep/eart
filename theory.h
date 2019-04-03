@@ -68,7 +68,7 @@
 #define LOCRIAN 6
 
 #define MAJOR 0
-#define MINOR -1
+#define MINOR 5
 
 #define SN(A, B) (s_note){(A), (B)}
 
@@ -110,6 +110,8 @@ s_note resolve_chromatic(c_note cn, mode_i mode);
 
 s_note enharm(int direction);
 
+class Note;
+
 /*
  * A Key represents one of the 12 equal tempered notes from
  * the perspective that the note is the key center of some
@@ -144,7 +146,10 @@ public:
 
     /* given any chromatic note, find an interval that the note makes with this
     key.  */
-    s_note interval_in_key(c_note cn);
+    s_note interpret_in_key(c_note cn);
+
+    Key interval_key(s_note intv, mode_i m);
+    Note interval_note(int octave, s_note intv);
 
     mode_i get_mode() const;
     /* if update_repr is true, set_mode rechecks the key signature
