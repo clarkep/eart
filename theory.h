@@ -108,6 +108,10 @@ c_note s_to_c(s_note note);
 c_note sintv_to_cintv(s_note sintv);
 s_note resolve_chromatic(c_note cn, mode_i mode);
 
+/* return the (lowest positive) interval that adds num_sharps sharps to a key
+   signature when transposing. For examples from_sharps(3)==SN(5, 0)*/
+s_note from_sharps(int num_sharps);
+
 s_note enharm(int direction);
 
 class Note;
@@ -142,7 +146,7 @@ public:
     flatsharp_limit is 7 by default and can be changed with static method
     set_flatsharp_limit. */
     Key(s_note sn, mode_i m); // 7-note representation, and mode.
-    Key(std::string n);       //string representation
+    Key(std::string n="C");       //string representation
 
     /* given any chromatic note, find an interval that the note makes with this
     key.  */
@@ -181,10 +185,6 @@ private:
     mode_i mode;
     s_note staff_n;
 };
-
-/* helper function to construct a Key given the number of sharps or flats
- * in that key. key_from_sharps(G, LYDIAN) */
-Key key_from_sharps(int sharps, mode_i mode);
 
 /* represents notes from C0(midi number 12) to G9(midi number 127) */
 class Note
@@ -225,7 +225,15 @@ private:
 };
 
 /* chords can be represented as vectors of notes */
-std::string chord_string(std::vector<Note> *chord);
+std::string chord_string(std::vector<Note> chord);
+
+/* transpositions: generates all possible intervals by which to transpose a key
+   such that the tranposition doesn't shift notes up or down by more than
+   [uprange, downrange] semitones, and it doesn't add more flats or sharps
+   to the key signature than [flat_limit, sharp_limit]. Includes the zero
+   interval, SN(0, 0).*/
+std::vector<s_note> transpositions(int down_range, int up_range, int flat_limit, int sharp_limit);
+
 
 
 #endif

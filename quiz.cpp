@@ -7,8 +7,10 @@
 
 #include "quiz.h"
 #include "theory.h"
+#include "synth1.h"
 #include <vector>
 #include <string>
+#include <cctype>
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
@@ -31,84 +33,117 @@ int randint(int min, int max)
     return min + rand()%(max - min);
 }
 
-// TODO: refactor so that each key has an equal chance of being selected, instead of each note.
-ChordQItem transpose_q(std::vector<Note> *chord, int min_mn, int max_mn,
-                      string suffix, Key k, int flatsharp_limit, bool show_lowest)
+int min_mn(vector<ChordQItem> chords)
 {
-    int fs_limit, old_flatsharp_limit;
-    if (flatsharp_limit < 0) {
-        fs_limit = Key::get_flatsharp_limit();
-    } else {
-        fs_limit = flatsharp_limit;
-        old_flatsharp_limit = Key::get_flatsharp_limit();
-        Key::set_flatsharp_limit(max(6, flatsharp_limit));
-    }
-
-    Note top = *max_element(chord->begin(), chord->end());
-    Note bottom = *min_element(chord->begin(), chord->end());
-    int uprange = max_mn - top.get_midi_n();
-    int downrange = bottom.get_midi_n() - min_mn;
-
-    vector<int> *keys = randints(-fs_limit, fs_limit+1);
-    Key k1 = key_from_sharps(keys->back(), k.get_mode());
-    int octave;
-    keys->pop_back();
-    bool key_works = false;
-    while (!key_works) {
-        int up_cintv = positive_modulo(k1.get_chrom_n() - k.get_chrom_n(), 12);
-        int up_octaves = uprange/12 + ((uprange % 12) > up_cintv ? 1 : 0);
-        int down_cintv = 12 - up_cintv;
-        int down_octaves = downrange/12 + ((downrange % 12) >= down_cintv ? 1 : 0);
-
-        if (up_octaves || down_octaves)
-        {
-            key_works = true;
-            octave = randint(-down_octaves, up_octaves);
-        } else {
-            if (keys->size()) {
-                k1 = key_from_sharps(keys->back(), k.get_mode());
-                keys->pop_back();
-            } else {
-                throw logic_error("transpose_q: no possibilities with given"
-                    " range [min_mn, max) and flatsharp_limit");
-            }
+    int bottom = 10000;
+    for(int i=0; i<chords.size(); i++) {
+        vector<Note> chord = chords.at(i).notevec;
+        Note b = *min_element(chord.begin(), chord.end());
+        if (b.get_midi_n() < bottom) {
+            bottom = b.get_midi_n();
         }
     }
+    return bottom;
+}
 
-    ChordQItem result;
-    vector<Note> *new_chord = new vector<Note>();
-    for (int i = 0; i < chord->size(); i++) {
-        Note n = chord->at(i).ktranspose(k, k1, octave);
-        new_chord->push_back(n);
+int max_mn(vector<ChordQItem> chords)
+{
+    int top = -10000;
+    for(int i=0; i<chords.size(); i++) {
+        vector<Note> chord = chords.at(i).notevec;
+        Note t = *max_element(chord.begin(), chord.end());
+        if (t.get_midi_n() > top) {
+            top = t.get_midi_n();
+        }
     }
-    Note new_low_note = *min_element(new_chord->begin(), new_chord->end());
-    string chord_name = k1.disp() + suffix +
-      (show_lowest ? ("(low=" + new_low_note.disp() + ")") : "");
-    result.notevec = new_chord;
-    result.name = chord_name;
+    return top;
+}
 
-    if (flatsharp_limit != -1) {
-        Key::set_flatsharp_limit(old_flatsharp_limit);
+int SingleQuiz::next_round()
+{
+    ChordQItem cur = get_item();
+    string resp = "r";
+    while (resp == "r") {
+        cout << "Playing..." << endl;
+        synth->chord_on(cur.notevec);
+        cout << "Reveal(enter), or repeat(r): ";
+        getline(cin, resp);
     }
-    return result;
+    cout << cur.key.disp() << cur.suffix << endl;
+    cout << "Continue(enter), or quit(q): ";
+    getline(cin, resp);
+
+    synth->chord_off(cur.notevec);
+    if (resp == "q") {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+ChordQItem Majmin7Quiz::get_item()
+{
+    return quiz_root_pos_majmin_7ths();
+}
+
+vector<ChordQItem> transpose_q(vector<ChordQItem> chords, int lower, int upper,
+    int min_sharps, int max_sharps, bool show_lowest)
+{
+    int top = max_mn(chords);
+    int bottom = min_mn(chords);
+
+    int uprange = upper - top;
+    int downrange = lower - bottom;
+    vector<s_note> trans_options = transpositions(downrange, uprange, min_sharps, max_sharps);
+    s_note trans = trans_options.at(rand()%(trans_options.size()));
+
+    vector<ChordQItem> results;
+    for (int i=0; i<chords.size(); i++){
+        ChordQItem q_item = chords.at(i);
+        ChordQItem res;
+        res.key = q_item.key.interval_key(trans, q_item.key.get_mode());
+        for (int j = 0; j < q_item.notevec.size(); j++) {
+            Note n = q_item.notevec.at(j).ktranspose(q_item.key, trans);
+            res.notevec.push_back(n);
+        }
+        Note new_low_note = *min_element(res.notevec.begin(), res.notevec.end());
+        res.suffix = q_item.suffix +
+          (show_lowest ? ("(low=" + new_low_note.disp() + ")") : "");
+        results.push_back(res);
+    }
+    return results;
 }
 
 ChordQItem quiz_root_pos_majmin_7ths()
 {
     vector<Note> cmaj7{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4), Note(C_B, 4)};
     vector<Note> cmin7{Note(C_C, 4), Note(C_E_FLAT, 4), Note(C_G, 4), Note(C_B_FLAT, 4)};
-    int maj = (rand() % 2);
+    int maj = 0; // TODO: revert
+    ChordQItem q;
     switch(maj)
     {
         case 0: {
-            return transpose_q(&cmin7, 35, 85, "min7");
+            q.key=Key("Cm");
+            q.notevec=cmin7;
+            q.suffix="min7";
             break;
         }
         case 1: {
-            return transpose_q(&cmaj7, 35, 85, "maj7");
+            q.key=Key("C");
+            q.notevec=cmaj7;
+            q.suffix="maj7";
             break;
         }
     }
+    return transpose_q({q}, 35, 85, -6, 6).at(0);
+}
+
+vector<ChordQItem> maj_root_movements()
+{
+    vector<Note> cmaj{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4)};
+    ChordQItem orig = {cmaj, Key("C"), ""};
+    ChordQItem res1 = transpose_q({orig}, 40, 80, -6, 6).at(0);
+    ChordQItem res2 = transpose_q({res1}, min_mn({res1})-11, max_mn({res1})+11, -6, 6).at(0);
 }
 
 ChordQItem major_triad_quiz()
@@ -131,17 +166,17 @@ ChordQItem major_triad_quiz()
     Key k = root.to_key(MAJOR);
     int oct =  root.get_octave();
 
-    vector<Note> *notes = new vector<Note>();
+    vector<Note> notes;
     for(int i = 0; i < 3; i++)
     {
         Note n = Note(k, oct, SN(2*i, 0));
         if (inv > i) {
             n = n.ctranspose(12);
         }
-        notes->push_back(n);
+        notes.push_back(n);
     }
     ChordQItem ret;
     ret.notevec = notes;
-    ret.name = "t";
+    ret.suffix = "t";
     return ret;
 }

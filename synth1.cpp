@@ -42,17 +42,17 @@ void NoteSynth::note_off(Note n)
     fluid_synth_noteoff(synth, 0, n.get_midi_n());
 }
 
-void NoteSynth::chord_on(vector<Note> *notevec)
+void NoteSynth::chord_on(vector<Note> notevec)
 {
-    for (int i = 0; i < notevec->size(); i++) {
-        note_on(notevec->at(i));
+    for (int i = 0; i < notevec.size(); i++) {
+        note_on(notevec.at(i));
     }
 }
 
-void NoteSynth::chord_off(vector<Note> *notevec)
+void NoteSynth::chord_off(vector<Note> notevec)
 {
-    for (int i = 0; i < notevec->size(); i++) {
-        note_off(notevec->at(i));
+    for (int i = 0; i < notevec.size(); i++) {
+        note_off(notevec.at(i));
     }
 }
 
@@ -64,7 +64,7 @@ void NoteSynth::play_note(Note n)
     fluid_synth_noteoff(synth, 0, midi_n);
 }
 
-void NoteSynth::play_chord(vector<Note> *notevec)
+void NoteSynth::play_chord(vector<Note> notevec)
 {
     chord_on(notevec);
     sleep(SUSTAIN_TIME);

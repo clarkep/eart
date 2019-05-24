@@ -17,11 +17,11 @@ public:
     ~NoteSynth();
     void note_on(Note n);
     void note_off(Note n);
-    void chord_on(std::vector<Note> *notevec);
-    void chord_off(std::vector<Note> *notevec);
+    void chord_on(std::vector<Note> notevec);
+    void chord_off(std::vector<Note> notevec);
     //void panic(); TODO
     void play_note(Note n);
-    void play_chord(std::vector<Note> *notevec);
+    void play_chord(std::vector<Note> notevec);
 private:
     fluid_settings_t* settings;
     fluid_audio_driver_t* adriver;

@@ -6,30 +6,23 @@
 #include <iostream>
 #include <ctime>
 
-
 using namespace std;
 
 void chord_quiz_basic()
 {
-	auto seed = time(NULL);
+	auto seed = 5001;
 	srand(seed);
-	NoteSynth synth = NoteSynth();
-	ChordQItem current;
-	cout << "Begin Quiz? [Y/n]: ";
+	NoteSynth *synth = new NoteSynth();
+	Quiz *quiz = new Majmin7Quiz(synth);
+
 	string resp;
+	cout << "Begin Quiz? [Y/n]: ";
 	getline(cin, resp);
-	while (resp != "q")
+	int cont = (resp == "n") ? 0 : 1;
+	quiz->begin();
+	while (cont)
 	{
-		if (resp != "r") {
-			current = quiz_root_pos_majmin_7ths();
-		}
-		synth.chord_on(current.notevec);
-		cout << "Press Enter to continue, r to repeat, q to quit: ";
-		getline(cin, resp);
-		if (resp != "r") {
-			cout << current.name << endl;
-		}
-		synth.chord_off(current.notevec);
+		cont = quiz->next_round();
 	}
 }
 

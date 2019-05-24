@@ -37,12 +37,11 @@ bool s_note_eq(s_note a, s_note b)
 
 /* https://stackoverflow.com/questions/14997165 */
 int positive_modulo(int i, int n) {
-    int tmp = i % n;
-    return tmp ? i >= 0 ? tmp : tmp + n : 0;
+    return (i % n + n) % n;
 }
 
 int floor_divide(int x, int y) {
-    return x >= 0 ? x / y : (x/y) - 1;
+    return ((x >= 0) || !(x % y)) ? x / y : x/y - 1;
 }
 
 string s_note_str(int s)
@@ -144,7 +143,7 @@ s_note add_intv(s_note base, s_note intv)
 {
     s_note res;
     int key_sharps = -s_note_flats(base);
-    int nec = thirds_from_six(positive_modulo(intv.n, 7)); //fourths from a major 7th, the first note to get a sharp.
+    int nec = thirds_from_six(positive_modulo(intv.n, 7)); //thirds from a major 6th, the first note to get a sharp.
     res.n = positive_modulo(base.n + intv.n, 7);
     res.fps = floor((float) key_sharps / (float) 7) + ((positive_modulo(key_sharps, 7)>=(nec + 1)) ? 1 : 0) + intv.fps;
     return res;
@@ -179,10 +178,15 @@ c_note s_to_c(s_note note)
 
 c_note sintv_to_cintv(s_note sintv)
 {
-    int oc = sintv.n / 7;
-    if (sintv.n < 0) {
-        oc = oc - 1; //intervals 0-6 should be octave 0; -6 to -1 are octave -1.
-    }
+    /* this bug lasted a loooong time, so I'm keeping it here
+       (If intervals were a negative multiple of 7 they would end up an octave
+       to low :). */
+
+    //int oc = sintv.n / 7;
+    //if (sintv.n < 0) {
+    //    oc = oc - 1; //intervals 0-6 should be octave 0; -6 to -1 are octave -1.
+    //}
+    int oc = floor_divide(sintv.n, 7);
     int sint = positive_modulo(sintv.n, 7);
     return
         positive_modulo(11 + thirds_from_six(sint)*5, 12)
@@ -209,6 +213,14 @@ s_note resolve_chromatic(c_note cn, mode_i mode)
     /* reverse: positive for sharps, negative for flats */
     ret.fps = (key_flats >= 0 ? -1 : 1) * ((abs(key_flats + 2) + 3) / 7);
 
+    return ret;
+}
+
+s_note from_sharps(int num_sharps)
+{
+    s_note ret;
+    ret.n = positive_modulo(S_B + 3*(5-num_sharps), 7);
+    ret.fps = floor_divide(num_sharps + 1, 7);
     return ret;
 }
 
@@ -322,7 +334,7 @@ s_note Key::interpret_in_key(c_note cn)
         if (intv.n == 6) {intv.fps -= 1;}
     }
 /* we should have found a name by now */
-    throw logic_error("Error in _chrom_construct");
+    throw logic_error("Key:Error in _chrom_construct");
 }
 
 Key Key::interval_key(s_note intv, mode_i m)
@@ -440,15 +452,6 @@ void Key::set_modal(bool m)
     modal = m;
 }
 
-Key key_from_sharps(int sharps, mode_i mode)
-{
-    s_note staff_n;
-    int major_sharps = sharps + mode_flats(mode);
-    staff_n.n = positive_modulo(S_C - 3 * major_sharps, 7);
-    staff_n.fps = (major_sharps >= 0 ? 1 : -1) * ((abs(major_sharps - 2) + 3) / 7);
-    return Key(staff_n, mode);
-}
-
 /* Note functions */
 Note::Note(int mn)
 {
@@ -495,7 +498,7 @@ Note::Note(c_note cn, int oct, Key k)
  * interpretations with fewer flats or sharps. */
 void Note::_chrom_construct(int midi_n, Key k)
 {
-    int chrom_n = midi_n % 12;
+    int chrom_n = positive_modulo(midi_n, 12);
 /* first go by fourths to see if cn is the 0, 4, 1, 5, 2, 6, or #3. */
     s_note intv = k.interpret_in_key(chrom_n);
     this->octave = (midi_n/12) - 1;
@@ -527,7 +530,6 @@ Note Note::ktranspose(Key k_orig, int c_intv)
     return Note(Key(positive_modulo(k_orig.get_chrom_n() + c_intv, 12), k_orig.get_mode()), key_oct, this_intv);
 }
 
-/* TODO: ensure that this works for negative intervals */
 Note Note::ktranspose(Key k_orig, s_note intv)
 {
     s_note this_intv = get_intv(k_orig.get_staff_n(), this->staff_n);
@@ -585,15 +587,39 @@ bool Note::operator>(const Note &Note2)
     return this->get_midi_n() > Note2.get_midi_n();
 }
 
-string chord_string(vector<Note> *chord)
+string chord_string(vector<Note> chord)
 {
-    if (chord->size() == 0) {
+    if (chord.size() == 0) {
         return "{}";
     }
-    string ret = "{" + chord->at(0).disp();
-    for (int i = 1; i < chord->size(); i++) {
-        ret = ret + ", " + chord->at(i).disp();
+    string ret = "{" + chord.at(0).disp();
+    for (int i = 1; i < chord.size(); i++) {
+        ret = ret + ", " + chord.at(i).disp();
     }
     ret = ret + "}";
     return ret;
+}
+
+/* transpositions: generates all possible intervals by which to transpose a key
+   such that the transposition shifts notes between [min_cint, max_cint] semitones, and
+   it adds between [min_sharps, max_sharps] sharps to the key signature(all values can
+   be negative, meaning shifts down and flats respectively. If you want flats,
+   just think of it as [-max_flats, -min_flats].)
+
+   This could probably be implented by a simple linear algebra function- it is
+   equivalent to finding all points on a skewed grid within a set box. */
+vector<s_note> transpositions(int min_cint, int max_cint, int min_sharps, int max_sharps)
+{
+    vector<s_note> res;
+    for(int sharps=min_sharps; sharps<=max_sharps; sharps++) {
+        s_note base = from_sharps(sharps);
+        int base_cint = sintv_to_cintv(base);
+        int min_oct = floor_divide(min_cint-base_cint, 12)
+                        + ((min_cint-base_cint) % 12 ? 1 : 0); // include min_cint
+        int max_oct = floor_divide(max_cint-base_cint, 12);
+        for(int i=min_oct; i<=max_oct; i++) {
+            res.push_back(SN(base.n + 7*i, base.fps));
+        }
+    }
+    return res;
 }

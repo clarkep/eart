@@ -11,6 +11,27 @@
 
 using namespace std;
 
+void disp_vec(vector<s_note> v)
+{
+    for (int i = 0; i < v.size(); i++) {
+        cout << "(" << v.at(i).n << ", " << v.at(i).fps << "), ";
+    }
+    cout << endl;
+}
+
+bool vecs_equal(vector<s_note> v, vector<s_note> w)
+{
+    if (v.size()!=w.size()) {
+        return false;
+    }
+    for (int i = 0; i < v.size(); i++) {
+        if (!s_note_eq(v.at(i), w.at(i))) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool streams_equal(istream *stream1, istream *stream2)
 {
     string str1, str2;
@@ -90,6 +111,9 @@ int test_get_intv()
     res = get_intv(SN(S_C, 1), SN(S_B, 0));
     assert (res.n == 6);
     assert (res.fps == -1);
+    res = get_intv(SN(S_B, 0), SN(S_C, 0));
+    assert (res.n == 1);
+    assert (res.fps == -1);
     res = get_intv(SN(S_G, 1), SN(S_A, 1));
     assert (res.n == 1);
     assert (res.fps == 0);
@@ -149,6 +173,7 @@ int test_s_to_c() { //and sintv_to_cintv
     assert (s_to_c(SN(S_A, 2)) == C_B);
     assert (s_to_c(SN(S_F, -2)) == C_E_FLAT);
     assert (s_to_c(SN(S_B, -1)) == C_B_FLAT);
+    assert (s_to_c(SN(S_C, -1)) == C_B);
     assert (sintv_to_cintv(SN(4, 1)) == 8);
     assert (sintv_to_cintv(SN(1, -1)) == 1);
     assert (sintv_to_cintv(SN(8, -1)) == 13);
@@ -158,6 +183,7 @@ int test_s_to_c() { //and sintv_to_cintv
     assert (sintv_to_cintv(SN(-8, 0)) == -13);
     assert (sintv_to_cintv(SN(-4, -1)) == -8);
     assert (sintv_to_cintv(SN(-5, -1)) == -9);
+    assert (sintv_to_cintv(SN(0, -1)) == -1);
     cout << "Passed." << endl;
     return 0;
 }
@@ -216,6 +242,29 @@ int test_resolve_chromatic()
     res = resolve_chromatic(C_C_SHARP, DORIAN);
     assert (res.n == S_C);
     assert (res.fps = 1);
+    cout << "Passed." << endl;
+    return 0;
+}
+
+int test_from_sharps() {
+    cout << "Testing from_sharps..." << endl;
+    assert (s_note_eq(from_sharps(-2), SN(6, -1)));
+    assert (s_note_eq(from_sharps(3), SN(5, 0)));
+    assert (s_note_eq(from_sharps(0), SN(0,0)));
+    assert (s_note_eq(from_sharps(-11), SN(5, -2)));
+    assert (s_note_eq(from_sharps(-8), SN(3, -1)));
+    cout << "Passed." << endl;
+    return 0;
+}
+
+// TODO: add more test cases?
+int test_transpositions()
+{
+    cout << "Testing tranpositions..." << endl;
+    vector<s_note> v;
+    vector<s_note> sol{SN(2, -1 ), SN(-1, -1), SN(0, 0), SN(1, 0), SN(-1, 0)};
+    v = transpositions(-2, 3, -4, 5);
+    assert (vecs_equal(v, sol));
     cout << "Passed." << endl;
     return 0;
 }
@@ -305,27 +354,6 @@ int test_key_text_constructor() {
     istringstream stream1(out.str());
     ifstream stream2("testing/text_constructor.txt");
     assert (streams_equal(&stream1, &stream2));
-    cout << "Passed." << endl;
-    return 0;
-}
-
-int test_key_from_sharps()
-{
-    cout << "Testing key_from_sharps..." << endl;
-    Key::set_modal(true);
-    Key::set_flatsharp_limit(20);
-    Key k = key_from_sharps(2, LYDIAN);
-    assert (s_note_eq(k.get_staff_n(), SN(S_G, 0))); //?
-    assert (k.get_mode() == LYDIAN);
-    k = key_from_sharps(-8, AEOLIAN);
-    assert (s_note_eq(k.get_staff_n(), SN(S_D, -1)));
-    assert (k.get_mode() == AEOLIAN);
-    k = key_from_sharps(8, LYDIAN);
-    assert(s_note_eq(k.get_staff_n(), SN(S_C, 1)));
-    assert (k.get_mode() == LYDIAN);
-    k = key_from_sharps(-15, MAJOR);
-    assert (s_note_eq(k.get_staff_n(), SN(S_F, -2)));
-
     cout << "Passed." << endl;
     return 0;
 }
@@ -500,22 +528,25 @@ int test_note_ktranspose()
 
 /* tests for functions in the file quiz.cpp */
 // TODO: I tested a few edge cases, but needs more and consistent tests.
+
 int man_test_transpose_q()
 {
     int seed = 1340;
     srand(seed);
     NoteSynth synth = NoteSynth();
     vector<Note> chord{Note(C_D, 3), Note(C_F, 3), Note(C_A, 3)}; //Cmaj
+    ChordQItem c = {chord, Key("Dm"), "min"};
     for (int n=0; n < 10; n++) {
-        ChordQItem res = transpose_q(&chord, 50, 59, "min", Key("Dm"), 6, true);
+        vector<ChordQItem> res = transpose_q(vector<ChordQItem>{c}, 50, 59, -6, 6, true);
         //for (int i=0; i < res.notevec.size(); i++) {
         //    cout << res.notevec[i].disp() << " " << res.notevec[i].get_midi_n() << endl;
         //}
-        cout << res.name << endl;
-        cout << chord_string(res.notevec) << endl;
-        synth.play_chord(res.notevec);
+        cout << res.at(0).key.disp() << res.at(0).suffix << endl;
+        cout << chord_string(res.at(0).notevec) << endl;
+        synth.play_chord(res.at(0).notevec);
     }
 }
+
 
 int test_free_functions()
 {
@@ -529,6 +560,8 @@ int test_free_functions()
     test_s_note_flats();
     test_s_to_c();
     test_resolve_chromatic();
+    test_from_sharps();
+    test_transpositions();
 }
 
 int test_key()
@@ -539,7 +572,6 @@ int test_key()
     test_key_chrom_constructor();
     test_key_staff_constructor();
     test_key_text_constructor();
-    test_key_from_sharps();
 }
 
 int test_note()
@@ -557,11 +589,7 @@ int test_note()
 
 int test_misc()
 {
-    srand(134);
-    vector<int> *p = randints(0, 5);
-    for (int i = 0; i < 5; i++) {
-        cout << p->at(i) << endl;
-    }
+    Key k;
 }
 
 int main(int argc, char** argv)
