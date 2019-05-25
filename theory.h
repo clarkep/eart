@@ -224,6 +224,12 @@ private:
     int octave;
 };
 
+struct Chord {
+    Chord(std::vector<Note> nv={}, Key k=Key("C")) : notevec(nv), key(k) {}
+    std::vector<Note> notevec;
+    Key key;
+};
+
 /* chords can be represented as vectors of notes */
 std::string chord_string(std::vector<Note> chord);
 
