@@ -531,18 +531,18 @@ int test_note_ktranspose()
 
 int man_test_transpose_rand()
 {
-    int seed = 1340;
+    int seed = 1341;
     srand(seed);
     NoteSynth synth = NoteSynth();
-    vector<Note> chord{Note(C_D, 3), Note(C_F, 3), Note(C_A, 3)}; //Cmaj
+    vector<Note> chord{Note(C_D, 3), Note(C_F, 3), Note(C_A, 3)}; // Cmaj
     ChordQItem c = {chord, Key("Dm"), "min"};
     for (int n=0; n < 10; n++) {
-        vector<ChordQItem> res = transpose_rand(vector<ChordQItem>{c}, 50, 59, -6, 6, true);
+        vector<ChordQItem> res = transpose_rand({c}, 50, 59, -6, 6);
         //for (int i=0; i < res.notevec.size(); i++) {
         //    cout << res.notevec[i].disp() << " " << res.notevec[i].get_midi_n() << endl;
         //}
         cout << res.at(0).key.disp() << res.at(0).suffix << endl;
-        cout << chord_string(res.at(0).notevec) << endl;
+        cout << res.at(0).to_string() << endl;
         synth.play_chord(res.at(0).notevec);
     }
 }

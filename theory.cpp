@@ -587,14 +587,22 @@ bool Note::operator>(const Note &Note2)
     return this->get_midi_n() > Note2.get_midi_n();
 }
 
-string chord_string(vector<Note> chord)
+void Chord::transpose(s_note intv)
 {
-    if (chord.size() == 0) {
+    key = key.interval_key(intv, key.get_mode());
+    for(int i = 0; i<notevec.size(); i++) {
+        notevec.at(i) = notevec.at(i).ktranspose(key, intv);
+    }
+}
+
+string Chord::to_string() const
+{
+    if (notevec.size() == 0) {
         return "{}";
     }
-    string ret = "{" + chord.at(0).disp();
-    for (int i = 1; i < chord.size(); i++) {
-        ret = ret + ", " + chord.at(i).disp();
+    string ret = "{" + notevec.at(0).disp();
+    for (int i = 1; i < notevec.size(); i++) {
+        ret = ret + ", " + notevec.at(i).disp();
     }
     ret = ret + "}";
     return ret;

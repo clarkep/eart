@@ -86,28 +86,19 @@ ChordQItem Majmin7Quiz::get_item()
     return quiz_root_pos_majmin_7ths();
 }
 
-std::vector<ChordQItem> transpose_q(std::vector<ChordQItem> chords, s_note intv,
-                                        bool show_lowest)
+std::vector<ChordQItem> transpose_q(std::vector<ChordQItem> chords, s_note intv)
 {
     vector<ChordQItem> results;
-    for (int i=0; i<chords.size(); i++){
+    for (int i=0; i<chords.size(); i++) {
         ChordQItem curr = chords.at(i);
-        ChordQItem res;
-        res.key = curr.key.interval_key(intv, curr.key.get_mode());
-        for (int j = 0; j < curr.notevec.size(); j++) {
-            Note n = curr.notevec.at(j).ktranspose(curr.key, intv);
-            res.notevec.push_back(n);
-        }
-        Note new_low_note = *min_element(res.notevec.begin(), res.notevec.end());
-        res.suffix = curr.suffix +
-          (show_lowest ? ("(low=" + new_low_note.disp() + ")") : "");
-        results.push_back(res);
+        curr.transpose(intv);
+        results.push_back(curr);
     }
     return results;
 }
 
 vector<ChordQItem> transpose_rand(vector<ChordQItem> chords, int lower, int upper,
-    int min_sharps, int max_sharps, bool show_lowest)
+    int min_sharps, int max_sharps)
 {
     int top = max_mn(chords);
     int bottom = min_mn(chords);
@@ -116,7 +107,7 @@ vector<ChordQItem> transpose_rand(vector<ChordQItem> chords, int lower, int uppe
     int downrange = lower - bottom;
     vector<s_note> trans_options = transpositions(downrange, uprange, min_sharps, max_sharps);
     s_note trans = trans_options.at(rand()%(trans_options.size()));
-    return transpose_q(chords, trans, show_lowest);
+    return transpose_q(chords, trans);
 }
 
 ChordQItem quiz_root_pos_majmin_7ths()

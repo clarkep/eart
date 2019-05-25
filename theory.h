@@ -226,12 +226,12 @@ private:
 
 struct Chord {
     Chord(std::vector<Note> nv={}, Key k=Key("C")) : notevec(nv), key(k) {}
+    void transpose(s_note intv);
+    std::string to_string() const;
     std::vector<Note> notevec;
     Key key;
 };
 
-/* chords can be represented as vectors of notes */
-std::string chord_string(std::vector<Note> chord);
 
 /* transpositions: generates all possible intervals by which to transpose a key
    such that the tranposition doesn't shift notes up or down by more than
