@@ -152,7 +152,7 @@ public:
     key.  */
     s_note interpret_in_key(c_note cn);
 
-    Key interval_key(s_note intv, mode_i m);
+    Key interval_key(s_note intv, mode_i m) const;
     Note interval_note(int octave, s_note intv);
 
     mode_i get_mode() const;
@@ -197,18 +197,18 @@ public:
     Note(s_note, int oct);
     Note(Key k, int oct, s_note intv = (s_note){0, 0});
     /* transpose chromatically.*/
-    Note ctranspose(c_note c_intv);
+    Note ctranspose(c_note c_intv) const;
     /* transpose via the key center. The relationship between the note and the
        key center stays the same. The only difference between ktranspose and
        ctranspose is potentially how the new notes are notated.
        move the key center up by c_intv half steps, choosing the enharmonic
        with the least flats/sharps. */
-    Note ktranspose(Key k_orig, c_note c_intv);
-    Note ktranspose(Key k_orig, s_note sintv);
+    Note ktranspose(Key k_orig, c_note c_intv) const;
+    Note ktranspose(Key k_orig, s_note sintv) const;
     /* transpose to the new Key k. If which is 0, tranpose up to the nearest
        octave, if its 1, transpose an octave obove that, etc. If which is -1, transpose
        down to the nearest octave, if -2, an octave below that, etc */
-    Note ktranspose(Key k_orig, Key k_dest, int which=0);
+    Note ktranspose(Key k_orig, Key k_dest, int which=0) const;
     // return the key centered on this note's value. m is the mode of the new Key.
     Key to_key(int m);
     int get_midi_n() const;
@@ -216,8 +216,8 @@ public:
     s_note get_staff_n() const;
     int get_octave() const;
     std::string disp() const;
-    bool operator<(const Note &Note2);
-    bool operator>(const Note &Note2);
+    bool operator<(const Note &Note2) const;
+    bool operator>(const Note &Note2) const;
 private:
     void _chrom_construct(int mn, Key k);
     s_note staff_n;
@@ -226,7 +226,9 @@ private:
 
 struct Chord {
     Chord(std::vector<Note> nv={}, Key k=Key("C")) : notevec(nv), key(k) {}
-    void transpose(s_note intv);
+    Chord transpose(s_note intv) const;
+    Note get_min() const;
+    Note get_max() const;
     std::string to_string() const;
     std::vector<Note> notevec;
     Key key;

@@ -23,6 +23,8 @@
 
 #include "theory.h"
 #include <iostream>
+#include <vector>
+#include <algorithm>
 #include <string>
 #include <stdexcept>
 #include <stdlib.h>
@@ -178,9 +180,9 @@ c_note s_to_c(s_note note)
 
 c_note sintv_to_cintv(s_note sintv)
 {
-    /* this bug lasted a loooong time, so I'm keeping it here
+    /* this bug lasted a loooong time, s I'm keeping it here :)
        (If intervals were a negative multiple of 7 they would end up an octave
-       to low :). */
+       to low. */
 
     //int oc = sintv.n / 7;
     //if (sintv.n < 0) {
@@ -337,7 +339,7 @@ s_note Key::interpret_in_key(c_note cn)
     throw logic_error("Key:Error in _chrom_construct");
 }
 
-Key Key::interval_key(s_note intv, mode_i m)
+Key Key::interval_key(s_note intv, mode_i m) const
 {
     return Key(add_intv(this->staff_n, intv), m);
 }
@@ -517,20 +519,20 @@ Note::Note(Key k, int oct, s_note intv)
     this->staff_n = add_intv(k.get_staff_n(), intv);
 }
 
-Note Note::ctranspose(int c_intv)
+Note Note::ctranspose(int c_intv) const
 {
     return Note(this->get_midi_n() + c_intv);
 }
 
 
-Note Note::ktranspose(Key k_orig, int c_intv)
+Note Note::ktranspose(Key k_orig, int c_intv) const
 {
     s_note this_intv = get_intv(k_orig.get_staff_n(), this->staff_n);
     int key_oct = (this->get_midi_n() - sintv_to_cintv(this_intv) + c_intv) / 12 - 1;
     return Note(Key(positive_modulo(k_orig.get_chrom_n() + c_intv, 12), k_orig.get_mode()), key_oct, this_intv);
 }
 
-Note Note::ktranspose(Key k_orig, s_note intv)
+Note Note::ktranspose(Key k_orig, s_note intv) const
 {
     s_note this_intv = get_intv(k_orig.get_staff_n(), this->staff_n);
     int new_key_oct = (get_midi_n() - sintv_to_cintv(this_intv) + sintv_to_cintv(intv)) / 12 -1;
@@ -538,7 +540,7 @@ Note Note::ktranspose(Key k_orig, s_note intv)
     return Note(Key(new_key_sn, k_orig.get_mode()), new_key_oct, this_intv);
 }
 
-Note Note::ktranspose(Key k_orig, Key k_dest, int which)
+Note Note::ktranspose(Key k_orig, Key k_dest, int which) const
 {
     s_note this_intv = get_intv(k_orig.get_staff_n(), this->staff_n);
     int pos_dist = positive_modulo(k_dest.get_chrom_n() - k_orig.get_chrom_n(), 12);
@@ -577,22 +579,34 @@ string Note::disp() const
     return s_fps_str(this->staff_n) + std::to_string(this->octave);
 }
 
-bool Note::operator<(const Note &Note2)
+bool Note::operator<(const Note &Note2) const
 {
     return this->get_midi_n() < Note2.get_midi_n();
 }
 
-bool Note::operator>(const Note &Note2)
+bool Note::operator>(const Note &Note2) const
 {
     return this->get_midi_n() > Note2.get_midi_n();
 }
 
-void Chord::transpose(s_note intv)
+Chord Chord::transpose(s_note intv) const
 {
-    key = key.interval_key(intv, key.get_mode());
+    Key k = key.interval_key(intv, key.get_mode());
+    vector<Note> nv;
     for(int i = 0; i<notevec.size(); i++) {
-        notevec.at(i) = notevec.at(i).ktranspose(key, intv);
+        nv.push_back(notevec.at(i).ktranspose(key, intv));
     }
+    return Chord(nv, k);
+}
+
+Note Chord::get_min() const
+{
+    return *min_element(notevec.begin(), notevec.end());
+}
+
+Note Chord::get_max() const
+{
+    return *max_element(notevec.begin(), notevec.end());
 }
 
 string Chord::to_string() const

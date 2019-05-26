@@ -17,28 +17,45 @@
 
 using namespace std;
 
-/* randvec: generate a vector of the integers from start to stop-1, randomly sorted. */
-vector<int> *randints(int start, int stop)
+bool is_numeric(string s)
 {
-    vector<int> *ret = new vector<int>();
-    for (int i = start; i < stop; i++)
-    {
-        ret->insert(ret->begin() + rand()%(ret->size() + 1), i);
+    for (int i=0; i<s.size(); i++) {
+        if (!isdigit(s.at(i))) {
+            return false;
+        }
     }
-    return ret;
+    return true;
+}
+ChordQItem ChordQItem::transpose(s_note intv) const
+{
+    Chord c = Chord::transpose(intv);
+    return ChordQItem(c.notevec, c.key, suffix);
 }
 
-int randint(int min, int max)
+vector<ChordQItem> transpose_r(vector<ChordQItem> chords, int lower, int upper,
+                               int min_sharps, int max_sharps)
 {
-    return min + rand()%(max - min);
+    int uprange = upper - max_mn(chords);
+    int downrange = lower - min_mn(chords);
+    vector<s_note> trans_options = transpositions(downrange, uprange, min_sharps, max_sharps);
+    s_note trans = trans_options.at(rand()%(trans_options.size()));
+    return transpose(chords, trans);
+}
+
+vector<ChordQItem> transpose(vector<ChordQItem> chords, s_note intv)
+{
+    vector<ChordQItem> results;
+    for (int i=0; i<chords.size(); i++) {
+        results.push_back(chords.at(i).transpose(intv));
+    }
+    return results;
 }
 
 int min_mn(vector<ChordQItem> chords)
 {
     int bottom = 10000;
     for(int i=0; i<chords.size(); i++) {
-        vector<Note> chord = chords.at(i).notevec;
-        Note b = *min_element(chord.begin(), chord.end());
+        Note b = chords.at(i).get_min();
         if (b.get_midi_n() < bottom) {
             bottom = b.get_midi_n();
         }
@@ -50,8 +67,7 @@ int max_mn(vector<ChordQItem> chords)
 {
     int top = -10000;
     for(int i=0; i<chords.size(); i++) {
-        vector<Note> chord = chords.at(i).notevec;
-        Note t = *max_element(chord.begin(), chord.end());
+        Note t = chords.at(i).get_max();
         if (t.get_midi_n() > top) {
             top = t.get_midi_n();
         }
@@ -81,33 +97,48 @@ int SingleQuiz::next_round()
     }
 }
 
+int MultiQuiz::next_round()
+{
+    MultiQItem cur = get_item();
+    string resp = "r";
+    while (resp != "") {
+        if (resp == "r") {
+            cout << "Playing..." << endl;
+            for(int i = 0; i<cur.chords.size(); i++) {
+                synth->play_chord(cur.chords.at(i).notevec);
+            }
+        } else if (is_numeric(resp)) {
+            int pos = stoi(resp) - 1;
+            if ((pos>0) && (pos<cur.chords.size())) {
+                cout << "Playing..." << endl;
+                synth->play_chord(cur.chords.at(stoi(resp)).notevec);
+            } else {
+                cout << "Out of range." << endl;
+            }
+        } else {
+            cout << "Unknown input." << endl;
+        }
+        cout << "Reveal(enter), or repeat(r or #): ";
+        getline(cin, resp);
+    }
+    cout << cur.info << endl;
+    for (int i=0; i<cur.chords.size(); i++) {
+        cout << cur.chords.at(i).key.disp() << cur.chords.at(i).suffix << endl;
+    }
+    cout << "Continue(enter), or quit(q): ";
+    getline(cin, resp);
+
+    if (resp == "q") ? 0 : 1;
+}
+
 ChordQItem Majmin7Quiz::get_item()
 {
     return quiz_root_pos_majmin_7ths();
 }
 
-std::vector<ChordQItem> transpose_q(std::vector<ChordQItem> chords, s_note intv)
+MultiQItem RootMajMQuiz::get_item()
 {
-    vector<ChordQItem> results;
-    for (int i=0; i<chords.size(); i++) {
-        ChordQItem curr = chords.at(i);
-        curr.transpose(intv);
-        results.push_back(curr);
-    }
-    return results;
-}
-
-vector<ChordQItem> transpose_rand(vector<ChordQItem> chords, int lower, int upper,
-    int min_sharps, int max_sharps)
-{
-    int top = max_mn(chords);
-    int bottom = min_mn(chords);
-
-    int uprange = upper - top;
-    int downrange = lower - bottom;
-    vector<s_note> trans_options = transpositions(downrange, uprange, min_sharps, max_sharps);
-    s_note trans = trans_options.at(rand()%(trans_options.size()));
-    return transpose_q(chords, trans);
+    return maj_root_movements();
 }
 
 ChordQItem quiz_root_pos_majmin_7ths()
@@ -131,15 +162,16 @@ ChordQItem quiz_root_pos_majmin_7ths()
             break;
         }
     }
-    return transpose_rand({q}, 35, 85, -6, 6).at(0);
+    return transpose_r({q}, 35, 85, -6, 6).at(0);
 }
 
-vector<ChordQItem> maj_root_movements()
+MultiQItem maj_root_movements()
 {
     vector<Note> cmaj{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4)};
-    ChordQItem orig = {cmaj, Key("C"), ""};
-    ChordQItem res1 = transpose_rand({orig}, 40, 80, -6, 6).at(0);
-    ChordQItem res2 = transpose_rand({res1}, min_mn({res1})-11, max_mn({res1})+11, -6, 6).at(0);
+    ChordQItem orig = ChordQItem(cmaj, Key("C"), "");
+    ChordQItem res1 = transpose_r({orig}, 40, 80, -6, 6).at(0);
+    ChordQItem res2 = transpose_r({res1}, min_mn({res1})-11, max_mn({res1})+11, -6, 6).at(0);
+    return MultiQItem({res1, res2}, "---");
 }
 
 ChordQItem major_triad_quiz()

@@ -529,7 +529,7 @@ int test_note_ktranspose()
 /* tests for functions in the file quiz.cpp */
 // TODO: I tested a few edge cases, but needs more and consistent tests.
 
-int man_test_transpose_rand()
+int man_test_transpose_r()
 {
     int seed = 1341;
     srand(seed);
@@ -537,7 +537,7 @@ int man_test_transpose_rand()
     vector<Note> chord{Note(C_D, 3), Note(C_F, 3), Note(C_A, 3)}; // Cmaj
     ChordQItem c = {chord, Key("Dm"), "min"};
     for (int n=0; n < 10; n++) {
-        vector<ChordQItem> res = transpose_rand({c}, 50, 59, -6, 6);
+        vector<ChordQItem> res = transpose_r({c}, 50, 59, -6, 6);
         //for (int i=0; i < res.notevec.size(); i++) {
         //    cout << res.notevec[i].disp() << " " << res.notevec[i].get_midi_n() << endl;
         //}
@@ -594,7 +594,7 @@ int test_misc()
 
 int main(int argc, char** argv)
 {
-    man_test_transpose_rand();
+    //man_test_transpose_r();
 
     //test_misc();
     test_free_functions();

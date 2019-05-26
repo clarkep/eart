@@ -13,7 +13,7 @@ void chord_quiz_basic()
 	auto seed = 5001;
 	srand(seed);
 	NoteSynth *synth = new NoteSynth();
-	Quiz *quiz = new Majmin7Quiz(synth);
+	Quiz *quiz = new RootMajMQuiz(synth);
 
 	string resp;
 	cout << "Begin Quiz? [Y/n]: ";
