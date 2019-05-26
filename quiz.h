@@ -8,63 +8,17 @@
 #ifndef __QUIZ_H_INCLUDED__
 #define __QUIZ_H_INCLUDED__
 
-
 #include "theory.h"
 #include "synth1.h"
+#include "interface.h"
 #include <vector>
 #include <string>
-
-std::vector<int> *randints(int start, int stop);
-
-struct ChordQItem : Chord {
-    ChordQItem(std::vector<Note> nv, Key k, std::string suf) : Chord(nv, k), suffix(suf) {}
-    ChordQItem() : ChordQItem({}, Key("C"), "") {}
-    ChordQItem transpose(s_note intv) const;
-    std::string suffix;
-};
-
-struct MultiQItem {
-    MultiQItem(std::vector<ChordQItem> c, std::string i) : chords(c), info(i) {}
-    MultiQItem() : MultiQItem({}, "") {}
-    std::vector<ChordQItem> chords;
-    std::string info;
-};
 
 std::vector<ChordQItem> transpose(std::vector<ChordQItem> chords, s_note intv);
 std::vector<ChordQItem> transpose_r(std::vector<ChordQItem> chords, int lower, int upper,
                                     int max_sharps, int min_sharps);
 int max_mn(std::vector<ChordQItem> chords);
 int min_mn(std::vector<ChordQItem> chords);
-
-class Quiz
-{
-public:
-    Quiz(NoteSynth *s) : synth(s) {}
-    virtual void begin() {}
-    virtual int next_round() {}
-protected:
-    NoteSynth* synth;
-};
-
-class SingleQuiz : public Quiz
-{
-public:
-    SingleQuiz(NoteSynth *s) : Quiz(s) {}
-    virtual void begin() {}
-    virtual int next_round();
-protected:
-    virtual ChordQItem get_item() {}
-};
-
-class MultiQuiz : public Quiz
-{
-public:
-    MultiQuiz(NoteSynth *s) : Quiz(s) {}
-    virtual void begin() {}
-    virtual int next_round();
-protected:
-    virtual MultiQItem get_item() {}
-};
 
 class Majmin7Quiz : public SingleQuiz
 {

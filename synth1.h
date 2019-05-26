@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#define SUSTAIN_TIME 3
+#define SUSTAIN_TIME 2
 #define MAX_CHORD_LENGTH 10
 #define MAX_CLASSNAME_LENGTH 11
 
