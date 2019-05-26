@@ -1,6 +1,5 @@
-#include "theory.h"
 #include "synth1.h"
-#include "quiz.h"
+#include "interface.h"
 #include <string>
 #include <vector>
 #include <iostream>

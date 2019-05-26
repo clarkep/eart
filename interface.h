@@ -1,23 +1,10 @@
 #ifndef __INTERFACE_H_INCLUDED__
 #define __INTERFACE_H_INCLUDED__
 
+#include "quiz.h"
 #include "synth1.h"
 #include <vector>
 #include <string>
-
-struct ChordQItem : Chord {
-    ChordQItem(std::vector<Note> nv, Key k, std::string suf) : Chord(nv, k), suffix(suf) {}
-    ChordQItem() : ChordQItem({}, Key("C"), "") {}
-    ChordQItem transpose(s_note intv) const;
-    std::string suffix;
-};
-
-struct MultiQItem {
-    MultiQItem(std::vector<ChordQItem> c, std::string i) : chords(c), info(i) {}
-    MultiQItem() : MultiQItem({}, "") {}
-    std::vector<ChordQItem> chords;
-    std::string info;
-};
 
 class Quiz
 {
@@ -47,6 +34,24 @@ public:
     virtual int next_round();
 protected:
     virtual MultiQItem get_item() {}
+};
+
+class Majmin7Quiz : public SingleQuiz
+{
+public:
+    Majmin7Quiz(NoteSynth *s) : SingleQuiz(s) {}
+    void begin() {}
+protected:
+    ChordQItem get_item();
+};
+
+class RootMajMQuiz : public MultiQuiz
+{
+public:
+    RootMajMQuiz(NoteSynth *s) : MultiQuiz(s) {}
+    void begin() {}
+protected:
+    MultiQItem get_item();
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "interface.h"
+#include "quiz.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -69,4 +70,14 @@ int MultiQuiz::next_round()
     getline(cin, resp);
 
     return (resp == "q") ? 0 : 1;
+}
+
+ChordQItem Majmin7Quiz::get_item()
+{
+    return quiz_root_pos_majmin_7ths();
+}
+
+MultiQItem RootMajMQuiz::get_item()
+{
+    return maj_root_movements();
 }

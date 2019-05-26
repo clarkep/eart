@@ -67,16 +67,6 @@ int max_mn(vector<ChordQItem> chords)
     return top;
 }
 
-ChordQItem Majmin7Quiz::get_item()
-{
-    return quiz_root_pos_majmin_7ths();
-}
-
-MultiQItem RootMajMQuiz::get_item()
-{
-    return maj_root_movements();
-}
-
 ChordQItem quiz_root_pos_majmin_7ths()
 {
     vector<Note> cmaj7{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4), Note(C_B, 4)};
