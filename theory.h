@@ -88,6 +88,7 @@ int floor_divide(int x, int y);
 std::string c_note_str(c_note c);
 std::string s_note_str(int s);
 std::string s_fps_str(s_note s);
+std::string sintv_str(s_note sintv);
 std::string mode_str(mode_i m);
 
 int thirds_from_six(int sn);

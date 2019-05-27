@@ -17,6 +17,12 @@
 
 using namespace std;
 
+//stackoverflow.com/questions/6942273
+template <typename I>
+I vec_rand_element(vector<I> v)
+{
+    return v.at(rand() % v.size());
+}
 
 ChordQItem ChordQItem::transpose(s_note intv) const
 {
@@ -96,8 +102,9 @@ MultiQItem maj_root_movements()
     vector<Note> cmaj{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4)};
     ChordQItem orig = ChordQItem(cmaj, Key("C"), "");
     ChordQItem res1 = transpose_r({orig}, 40, 80, -6, 6).at(0);
-    ChordQItem res2 = transpose_r({res1}, min_mn({res1})-11, max_mn({res1})+11, -6, 6).at(0);
-    return MultiQItem({res1, res2}, "---");
+    s_note intv = vec_rand_element(transpositions(-11, 11, -6, 6));
+    ChordQItem res2 = res1.transpose(intv);
+    return MultiQItem({res1, res2}, sintv_str(intv));
 }
 
 ChordQItem major_triad_quiz()

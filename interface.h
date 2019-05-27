@@ -5,6 +5,7 @@
 #include "synth1.h"
 #include <vector>
 #include <string>
+#include <fstream>
 
 class Quiz
 {
@@ -52,6 +53,19 @@ public:
     void begin() {}
 protected:
     MultiQItem get_item();
+};
+
+class FileMQuiz : public MultiQuiz
+{
+public:
+    FileMQuiz(NoteSynth *s, std::string fn);
+    ~FileMQuiz();
+    void begin();
+protected:
+    MultiQItem get_item();
+private:
+    std::ifstream file;
+    std::vector<MultiQItem> items;
 };
 
 #endif

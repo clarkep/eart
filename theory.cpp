@@ -77,6 +77,15 @@ string s_fps_str(s_note sn) {
     return ret;
 }
 
+string sintv_str(s_note sintv){
+    string ret;
+    for (int i=0; i < abs(sintv.fps); i++) {
+        ret.append((sintv.fps > 0) ? "#" : "b");
+    }
+    ret.append(to_string(sintv.n));
+    return ret;
+}
+
 string c_note_str(c_note c) {
     c = c % 12;
     string r = "";
