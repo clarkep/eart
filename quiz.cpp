@@ -10,6 +10,7 @@
 #include "synth1.h"
 #include <vector>
 #include <string>
+#include <sstream>
 #include <cctype>
 #include <iostream>
 #include <algorithm>
@@ -17,12 +18,6 @@
 
 using namespace std;
 
-//stackoverflow.com/questions/6942273
-template <typename I>
-I vec_rand_element(vector<I> v)
-{
-    return v.at(rand() % v.size());
-}
 
 ChordQItem ChordQItem::transpose(s_note intv) const
 {
@@ -72,6 +67,7 @@ int max_mn(vector<ChordQItem> chords)
     }
     return top;
 }
+
 
 ChordQItem quiz_root_pos_majmin_7ths()
 {

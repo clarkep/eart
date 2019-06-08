@@ -191,6 +191,7 @@ private:
 class Note
 {
 public:
+    Note(std::string s);
     Note(int mn); // midi keycode
     Note(int mn, Key k);
     Note(c_note cn, int oct);

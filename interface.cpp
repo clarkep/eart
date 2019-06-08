@@ -1,8 +1,12 @@
 #include "interface.h"
+#include "synth1.h"
 #include "quiz.h"
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -14,6 +18,11 @@ bool is_numeric(string s)
         }
     }
     return true;
+}
+
+bool is_staff_letter(char c) {
+    string chars = "ABCDEFGabcdefg";
+    return (chars.find(c)!=-1);
 }
 
 int SingleQuiz::next_round()
@@ -37,6 +46,7 @@ int SingleQuiz::next_round()
         return 1;
     }
 }
+
 
 int MultiQuiz::next_round()
 {

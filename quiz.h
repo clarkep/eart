@@ -26,15 +26,23 @@ struct MultiQItem {
     std::string info;
 };
 
+//stackoverflow.com/questions/6942273
+template <typename I>
+I vec_rand_element(std::vector<I> v)
+{
+    return v.at(rand() % v.size());
+}
+
 std::vector<ChordQItem> transpose(std::vector<ChordQItem> chords, s_note intv);
 std::vector<ChordQItem> transpose_r(std::vector<ChordQItem> chords, int lower, int upper,
-                                    int max_sharps, int min_sharps);
+                                    int min_sharps, int max_sharps);
 int max_mn(std::vector<ChordQItem> chords);
 int min_mn(std::vector<ChordQItem> chords);
 
 
+
 /* transpose q: Tranpose a vector of chord quiz items. */
-std::vector<ChordQItem> transpose_q(std::vector<ChordQItem> chords, s_note intv);
+//std::vector<ChordQItem> transpose_q(std::vector<ChordQItem> chords, s_note intv);
 
 /* transpose_rand: Randomly transpose a chord or chords. Generator for other quizzes.
 

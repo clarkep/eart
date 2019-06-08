@@ -365,6 +365,23 @@ int test_key_misc()
 
 /* tests for the note class */
 
+int test_note_string_constructor()
+{
+    cout << "Testing string constructor..." << endl;
+    Note n = Note("C#4");
+    assert(n.get_midi_n()==61);
+    assert(s_note_eq(n.get_staff_n(), SN(S_C, 1)));
+    assert(n.get_octave()==4);
+    n = Note("Ab7");
+    assert(n.get_midi_n() == 104);
+    assert(s_note_eq(n.get_staff_n(), SN(S_A, -1)));
+    assert(n.get_octave() == 7);
+    n = Note("Cbb3");
+    assert(n.get_midi_n() == 58);
+    cout << "Passed." << endl;
+    return 0;
+}
+
 int test_note_chrom_constructor()
 {
     cout << "Testing chromatic constructor..." << endl;
@@ -579,6 +596,7 @@ int test_note()
     cout << "----------------------------------------------------------------" << endl;
     cout << "Testing Note class methods" << endl;
     cout << "----------------------------------------------------------------" << endl << endl;
+    test_note_string_constructor();
     test_note_chrom_constructor();
     test_note_staff_constructor();
     test_note_intv_constructor();

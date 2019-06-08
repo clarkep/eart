@@ -464,6 +464,25 @@ void Key::set_modal(bool m)
 }
 
 /* Note functions */
+Note::Note(std::string s)
+{
+    s.append(" "); //avoid out-of-bounds
+    char fc = s.at(0);
+    if (fc >= 'A' && fc <= 'G') {
+        staff_n.n = positive_modulo(fc - 'A' - 2, 7);
+    } else {
+        throw logic_error("Note must start with uppercase letter A-G");
+    }
+    staff_n.fps = 0;
+    char nc;
+    int i = 1;
+    while ((nc = s.at(i)) == 'b' || (nc == '#')) {
+        staff_n.fps += (nc == '#') ? 1 : -1;
+        i += 1;
+    }
+    octave = stoi(s.substr(i));
+}
+
 Note::Note(int mn)
 {
     this->octave = (mn / 12) - 1;

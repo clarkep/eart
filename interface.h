@@ -7,6 +7,9 @@
 #include <string>
 #include <fstream>
 
+bool is_numeric(std::string s);
+bool is_staff_letter(char s);
+
 class Quiz
 {
 public:
@@ -53,19 +56,6 @@ public:
     void begin() {}
 protected:
     MultiQItem get_item();
-};
-
-class FileMQuiz : public MultiQuiz
-{
-public:
-    FileMQuiz(NoteSynth *s, std::string fn);
-    ~FileMQuiz();
-    void begin();
-protected:
-    MultiQItem get_item();
-private:
-    std::ifstream file;
-    std::vector<MultiQItem> items;
 };
 
 #endif

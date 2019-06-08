@@ -1,5 +1,6 @@
 #include "synth1.h"
 #include "interface.h"
+#include "file_q.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -12,7 +13,7 @@ void chord_quiz_basic()
 	auto seed = 5001;
 	srand(seed);
 	NoteSynth *synth = new NoteSynth();
-	Quiz *quiz = new RootMajMQuiz(synth);
+	Quiz *quiz = new FileMQuiz(synth, "movements0.txt");
 
 	string resp;
 	cout << "Begin Quiz? [Y/n]: ";
