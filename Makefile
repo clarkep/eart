@@ -1,6 +1,6 @@
 objects = interface.o synth1.o quiz.o theory.o file_q.o
 
-flags = -std=c++11 -g3
+flags = -std=c++11
 
 libraries = -lfluidsynth
 
