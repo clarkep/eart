@@ -65,7 +65,6 @@ int min_mn(std::vector<ChordQItem> chords);
 /* triad in a random key and inversion */
 ChordQItem major_triad_quiz();
 /* root position major and minor seventh chords */
-//ChordQItem quiz_root_pos_majmin_7ths();
 
 MultiQItem maj_root_movements();
 

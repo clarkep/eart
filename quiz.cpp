@@ -67,31 +67,6 @@ int max_mn(vector<ChordQItem> chords)
     }
     return top;
 }
-/*
-ChordQItem quiz_root_pos_majmin_7ths()
-{
-    vector<Note> cmaj7{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4), Note(C_B, 4)};
-    vector<Note> cmin7{Note(C_C, 4), Note(C_E_FLAT, 4), Note(C_G, 4), Note(C_B_FLAT, 4)};
-    int maj = (rand() % 2);
-    ChordQItem q;
-    switch(maj)
-    {
-        case 0: {
-            q.key=Key("Cm");
-            q.get_notevec()=cmin7;
-            q.suffix="min7";
-            break;
-        }
-        case 1: {
-            q.key=Key("C");
-            q.notevec=cmaj7;
-            q.suffix="maj7";
-            break;
-        }
-    }
-    return transpose_r({q}, 35, 85, -6, 6).at(0);
-}
-*/
 
 MultiQItem maj_root_movements()
 {

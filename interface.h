@@ -52,16 +52,6 @@ private:
     std::vector<ChordQItem> qitems;
 };
 
-/*
-class Majmin7Quiz : public SingleQuiz
-{
-public:
-    Majmin7Quiz(NoteSynth *s) : SingleQuiz(s) {}
-    void begin() {}
-protected:
-    ChordQItem get_item();
-};
-*/
 
 class RootMajMQuiz : public MultiQuiz
 {

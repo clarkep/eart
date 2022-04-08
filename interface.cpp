@@ -98,12 +98,6 @@ ChordQItem ListQuiz::get_item()
    int i = rand() % this->qitems.size();
    return this->qitems.at(i);
 }
-/*
-ChordQItem Majmin7Quiz::get_item()
-{
-    return quiz_root_pos_majmin_7ths();
-}
-*/
 
 MultiQItem RootMajMQuiz::get_item()
 {
