@@ -3,12 +3,16 @@
 #include "synth1.h"
 #include <vector>
 #include <string>
-#include <fstream>
+#include <cstdlib>
 
-std:vector<ChordQItem> basic_triads()
-{
+using namespace std;
+using namespace std::string_literals;
+
+std::vector<ChordQItem> basic_triads()
+{ 
+    Key k(rand() % 12, MAJOR);
     
-    ChordQItem c(
-
+    return {ChordQItem(major_triad(k.scale_note(4, 0)), "M"s),
+            ChordQItem(major_triad(k.scale_note(4, 4)), "M"s)};
 
 }

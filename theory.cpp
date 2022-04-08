@@ -355,10 +355,13 @@ Note Key::scale_note(int octave, int scale_n)
 {
     int dist_to_ionian_key = -sintv_to_cintv((s_note) {this->mode, 0});
     int i_key_sbase = positive_modulo(this->staff_n.n-this->mode, 7);
-    int dist_to_sbase = -sintv_to_cintv(get_intv((s_note){i_key_sbase, 0}, this->staff_n)); 
+    int dist_to_sbase = -sintv_to_cintv(get_intv((s_note){i_key_sbase, 0}, 
+        this->staff_n)); 
     int fps = dist_to_ionian_key - dist_to_sbase;
-    s_note result = add_intv((s_note){i_key_sbase, fps}, (s_note){scale_n + this->mode, 0});
-    int new_octave = octave + floor_divide(positive_modulo(this->staff_n.n + 2, 7) + scale_n, 7);
+    s_note result = add_intv((s_note){i_key_sbase, fps}, 
+        (s_note){scale_n + this->mode, 0});
+    int new_octave = octave + 
+        floor_divide(positive_modulo(this->staff_n.n + 2, 7) + scale_n, 7);
     return Note(result, new_octave);
 
 }
@@ -654,18 +657,24 @@ string Chord::to_string() const
     ret = ret + "}";
     return ret;
 }
-/*
-Chord triad(Note n, bool minor)
-{
-    if (minor) {
-        Key k(n.get_staff_n(), MINOR);
-    } else {
-        Key k(n.get_staff_n(), MAJOR)
-    }
-    
 
+
+
+Chord major_triad(Note n)
+{
+    Key k = n.to_key(MAJOR);
+    int oct = n.get_octave();
+    vector<Note> nv = {k.scale_note(oct, 0), k.scale_note(oct, 2), k.scale_note(oct, 4)};
+    return Chord(nv, k); 
 }
-*/
+
+Chord minor_triad(Note n)
+{
+    Key k = n.to_key(MINOR);
+    int oct = n.get_octave();
+    vector<Note> nv = {k.scale_note(oct, 0), k.scale_note(oct, 2), k.scale_note(oct, 4)};
+    return Chord(nv, k); 
+}
 
 /* transpositions: generates all possible intervals by which to transpose a key
    such that the transposition shifts notes between [min_cint, max_cint] semitones, and

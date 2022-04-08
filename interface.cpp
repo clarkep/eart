@@ -31,15 +31,15 @@ int SingleQuiz::next_round()
     string resp = "r";
     while (resp == "r") {
         cout << "Playing..." << endl;
-        synth->chord_on(cur.notevec);
+        synth->chord_on(cur.get_notevec());
         cout << "Reveal(enter), or repeat(r): ";
         getline(cin, resp);
     }
-    cout << cur.key.disp() << cur.suffix << endl;
+    cout << cur.get_key().disp() << cur.suffix << endl;
     cout << "Continue(enter), or quit(q): ";
     getline(cin, resp);
 
-    synth->chord_off(cur.notevec);
+    synth->chord_off(cur.get_notevec());
     if (resp == "q") {
         return 0;
     } else {
@@ -56,13 +56,13 @@ int MultiQuiz::next_round()
         if (resp == "r") {
             cout << "Playing..." << endl;
             for(int i = 0; i<cur.chords.size(); i++) {
-                synth->play_chord(cur.chords.at(i).notevec);
+                synth->play_chord(cur.chords.at(i).get_notevec());
             }
         } else if (is_numeric(resp)) {
             int pos = stoi(resp) - 1;
             if ((pos>0) && (pos<cur.chords.size())) {
                 cout << "Playing..." << endl;
-                synth->play_chord(cur.chords.at(stoi(resp)).notevec);
+                synth->play_chord(cur.chords.at(stoi(resp)).get_notevec());
             } else {
                 cout << "Out of range." << endl;
             }
@@ -74,7 +74,7 @@ int MultiQuiz::next_round()
     }
     cout << cur.info << endl;
     for (int i=0; i<cur.chords.size(); i++) {
-        cout << cur.chords.at(i).key.disp() << cur.chords.at(i).suffix << endl;
+        cout << cur.chords.at(i).get_key().disp() << cur.chords.at(i).suffix << endl;
     }
     cout << "Continue(enter), or quit(q): ";
     getline(cin, resp);
@@ -98,11 +98,12 @@ ChordQItem ListQuiz::get_item()
    int i = rand() % this->qitems.size();
    return this->qitems.at(i);
 }
-
+/*
 ChordQItem Majmin7Quiz::get_item()
 {
     return quiz_root_pos_majmin_7ths();
 }
+*/
 
 MultiQItem RootMajMQuiz::get_item()
 {

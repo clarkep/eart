@@ -43,7 +43,7 @@ vector<Note> get_chord(string line)
     }
     return ret;
 }
-
+/*
 FileMQuiz::FileMQuiz(NoteSynth *s, std::string filename) :  MultiQuiz(s)
 {
     ifstream ifs(filename);
@@ -62,9 +62,9 @@ FileMQuiz::FileMQuiz(NoteSynth *s, std::string filename) :  MultiQuiz(s)
             } else if (!((cur_type == t_blank) == (prev_type == t_range))) {
                 throw logic_error("invalid line in input file: a blank line must come after note range.");
             } else if (cur_type == t_chord) {
-                cur_chord.notevec = get_chord(line);
+                cur_chord.get_notevec() = get_chord(line);
             } else if (cur_type == t_key) {
-                cur_chord.key = Key(line);
+                cur_chord.get_key = Key(line);
                 cur_item.chords.push_back(cur_chord);
             } else if (cur_type == t_range) {
                 istringstream line_stream(line);
@@ -89,3 +89,4 @@ MultiQItem FileMQuiz::get_item()
     MultiQRange item = vec_rand_element(items);
     return MultiQItem(transpose_r(item.chords, item.min_mn, item.max_mn, -6, 6), "");
 }
+*/

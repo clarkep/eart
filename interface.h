@@ -52,6 +52,7 @@ private:
     std::vector<ChordQItem> qitems;
 };
 
+/*
 class Majmin7Quiz : public SingleQuiz
 {
 public:
@@ -60,6 +61,7 @@ public:
 protected:
     ChordQItem get_item();
 };
+*/
 
 class RootMajMQuiz : public MultiQuiz
 {

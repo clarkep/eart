@@ -6,7 +6,7 @@
 #include "quiz.h"
 #include "interface.h"
 
-std::vector<ChordQItem> basic_triads()
+std::vector<ChordQItem> basic_triads();
 
 
 

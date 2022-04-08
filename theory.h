@@ -239,9 +239,10 @@ public:
     Key key;
 };
 
-/*
-Chord triad(Note n, bool minor);
-*/
+
+Chord major_triad(Note n);
+Chord minor_triad(Note n);
+
 
 /* transpositions: generates all possible intervals by which to transpose a key
    such that the tranposition doesn't shift notes up or down by more than

@@ -22,7 +22,7 @@ struct MultiQRange : MultiQItem
 enum LineType {t_blank, t_chord, t_key, t_range, t_invalid};
 LineType classify_line(std::string s);
 std::vector<Note> get_chord(std::string line);
-
+/*
 class FileMQuiz : public MultiQuiz
 {
 public:
@@ -33,5 +33,6 @@ protected:
 private:
     std::vector<MultiQRange> items;
 };
+*/
 
 #endif

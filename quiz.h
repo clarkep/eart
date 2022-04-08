@@ -14,12 +14,15 @@
 
 using namespace std::string_literals;
 
-class ChordQItem : public Chord 
+class ChordQItem 
 {
 public:
-    ChordQItem(std::vector<Note> nv, Key k, std::string suf) : Chord(nv, k), suffix(suf) {}
-    ChordQItem() : ChordQItem({}, Key("C"s), ""s) {}
+    ChordQItem(Chord ch, std::string suf) : chord(ch), suffix(suf) {}
+    ChordQItem() : ChordQItem(Chord({}, Key("C"s)), ""s) {}
     ChordQItem transpose(s_note intv) const;
+    std::vector<Note> get_notevec() { return this->chord.notevec; }
+    Key get_key() { return this->chord.key; } 
+    Chord chord;
     std::string suffix;
 };
 
@@ -62,7 +65,7 @@ int min_mn(std::vector<ChordQItem> chords);
 /* triad in a random key and inversion */
 ChordQItem major_triad_quiz();
 /* root position major and minor seventh chords */
-ChordQItem quiz_root_pos_majmin_7ths();
+//ChordQItem quiz_root_pos_majmin_7ths();
 
 MultiQItem maj_root_movements();
 
