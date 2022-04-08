@@ -155,6 +155,8 @@ public:
 
     Key interval_key(s_note intv, mode_i m) const;
     Note interval_note(int octave, s_note intv);
+    /* return the nth note in the the key's scale */
+    Note scale_note(int octave, int scale_n);
 
     mode_i get_mode() const;
     /* if update_repr is true, set_mode rechecks the key signature
@@ -226,7 +228,8 @@ private:
     int octave;
 };
 
-struct Chord {
+class Chord {
+public:
     Chord(std::vector<Note> nv={}, Key k=Key("C")) : notevec(nv), key(k) {}
     Chord transpose(s_note intv) const;
     Note get_min() const;
@@ -236,6 +239,9 @@ struct Chord {
     Key key;
 };
 
+/*
+Chord triad(Note n, bool minor);
+*/
 
 /* transpositions: generates all possible intervals by which to transpose a key
    such that the tranposition doesn't shift notes up or down by more than

@@ -12,16 +12,21 @@
 #include <vector>
 #include <string>
 
-struct ChordQItem : Chord {
+using namespace std::string_literals;
+
+class ChordQItem : public Chord 
+{
+public:
     ChordQItem(std::vector<Note> nv, Key k, std::string suf) : Chord(nv, k), suffix(suf) {}
-    ChordQItem() : ChordQItem({}, Key("C"), "") {}
+    ChordQItem() : ChordQItem({}, Key("C"s), ""s) {}
     ChordQItem transpose(s_note intv) const;
     std::string suffix;
 };
 
-struct MultiQItem {
+class MultiQItem {
+public:
     MultiQItem(std::vector<ChordQItem> c, std::string i) : chords(c), info(i) {}
-    MultiQItem() : MultiQItem({}, "") {}
+    MultiQItem() : MultiQItem({}, ""s) {}
     std::vector<ChordQItem> chords;
     std::string info;
 };
@@ -56,7 +61,7 @@ int min_mn(std::vector<ChordQItem> chords);
 
 /* triad in a random key and inversion */
 ChordQItem major_triad_quiz();
-/* root positioion major and minor seventh chords */
+/* root position major and minor seventh chords */
 ChordQItem quiz_root_pos_majmin_7ths();
 
 MultiQItem maj_root_movements();

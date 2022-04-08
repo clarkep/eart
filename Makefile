@@ -1,8 +1,8 @@
 objects = interface.o synth1.o quiz.o theory.o file_q.o
 
-flags = -std=c++11
+flags = -g
 
-libraries = -lfluidsynth
+libraries = -lfluidsynth 
 
 eart : main.o $(objects)
 	g++ $(flags) -o eart main.o $(objects) $(libraries)

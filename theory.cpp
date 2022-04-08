@@ -137,14 +137,11 @@ string mode_str(mode_i m) {
     return r;
 }
 
+int THIRDS_FROM_SIX[7] = { 5, 3, 1, 6, 4, 2, 0 };
+
 int thirds_from_six(int sn)
 {
-    int s2 = positive_modulo(sn, 7);
-    int octave = (sn < 6) ? 1 : 0;
-    while (((s2 - 6 + octave*7) % 3) != 0) {
-        octave += 1;
-    }
-    return (s2 - 6 + octave*7) / 3;
+    return THIRDS_FROM_SIX[positive_modulo(sn, 7)];
 }
 
 s_note add_intv(s_note base, s_note intv)
@@ -196,8 +193,7 @@ c_note sintv_to_cintv(s_note sintv)
     //}
     int oc = floor_divide(sintv.n, 7);
     int sint = positive_modulo(sintv.n, 7);
-    return
-        positive_modulo(11 + thirds_from_six(sint)*5, 12)
+    return positive_modulo(11 + thirds_from_six(sint)*5, 12)
         + oc * 12 + sintv.fps;
 }
 
@@ -353,6 +349,18 @@ Key Key::interval_key(s_note intv, mode_i m) const
 Note Key::interval_note(int octave, s_note intv)
 {
     return Note(*this, octave, intv);
+}
+
+Note Key::scale_note(int octave, int scale_n)
+{
+    int dist_to_ionian_key = -sintv_to_cintv((s_note) {this->mode, 0});
+    int i_key_sbase = positive_modulo(this->staff_n.n-this->mode, 7);
+    int dist_to_sbase = -sintv_to_cintv(get_intv((s_note){i_key_sbase, 0}, this->staff_n)); 
+    int fps = dist_to_ionian_key - dist_to_sbase;
+    s_note result = add_intv((s_note){i_key_sbase, fps}, (s_note){scale_n + this->mode, 0});
+    int new_octave = octave + floor_divide(positive_modulo(this->staff_n.n + 2, 7) + scale_n, 7);
+    return Note(result, new_octave);
+
 }
 
 mode_i Key::get_mode() const
@@ -646,6 +654,18 @@ string Chord::to_string() const
     ret = ret + "}";
     return ret;
 }
+/*
+Chord triad(Note n, bool minor)
+{
+    if (minor) {
+        Key k(n.get_staff_n(), MINOR);
+    } else {
+        Key k(n.get_staff_n(), MAJOR)
+    }
+    
+
+}
+*/
 
 /* transpositions: generates all possible intervals by which to transpose a key
    such that the transposition shifts notes between [min_cint, max_cint] semitones, and

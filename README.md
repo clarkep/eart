@@ -1,4 +1,4 @@
-# HEART - a HEARing Trainer
+# HEART - HEARing Trainer
 
 Heart is a simple ear training program based on fluidsynth.
 

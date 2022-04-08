@@ -82,6 +82,23 @@ int MultiQuiz::next_round()
     return (resp == "q") ? 0 : 1;
 }
 
+ListQuiz::ListQuiz(NoteSynth *s, std::vector<ChordQItem> (*gen_list)()) :
+    SingleQuiz(s) 
+{
+    this->gen = gen_list;
+}
+
+void ListQuiz::begin()
+{
+    qitems = (*(this->gen))();
+}
+
+ChordQItem ListQuiz::get_item()
+{
+   int i = rand() % this->qitems.size();
+   return this->qitems.at(i);
+}
+
 ChordQItem Majmin7Quiz::get_item()
 {
     return quiz_root_pos_majmin_7ths();

@@ -40,6 +40,18 @@ protected:
     virtual MultiQItem get_item() {}
 };
 
+class ListQuiz: public SingleQuiz
+{
+public:
+    ListQuiz(NoteSynth *s, std::vector<ChordQItem> (*gen_list)());
+    void begin();
+protected:
+    ChordQItem get_item();
+private:
+    std::vector<ChordQItem> (*gen)();
+    std::vector<ChordQItem> qitems;
+};
+
 class Majmin7Quiz : public SingleQuiz
 {
 public:
