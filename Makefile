@@ -13,7 +13,7 @@ test : test.o $(objects)
 	g++ $(flags) -o test test.o $(objects) $(libraries)
 
 %.o : %.cpp
-	g++ $(flags) -o $@ $<
+	g++ $(flags) -c -o $@ $< 
 
 clean:
 	rm eart test main.o test.o $(objects)
