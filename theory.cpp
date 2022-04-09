@@ -361,7 +361,7 @@ Note Key::scale_note(int octave, int scale_n)
     s_note result = add_intv((s_note){i_key_sbase, fps}, 
         (s_note){scale_n + this->mode, 0});
     int new_octave = octave + 
-        floor_divide(positive_modulo(this->staff_n.n + 2, 7) + scale_n, 7);
+        floor_divide(this->staff_n.n + scale_n, 7);
     return Note(result, new_octave);
 
 }

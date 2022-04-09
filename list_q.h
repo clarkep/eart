@@ -9,5 +9,4 @@
 std::vector<ChordQItem> basic_triads();
 
 
-
 #endif
