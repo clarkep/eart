@@ -660,17 +660,11 @@ string Chord::to_string() const
 
 
 
-Chord major_triad(Note n)
+Chord triad(Note n, bool minor)
 {
-    Key k = n.to_key(MAJOR);
-    int oct = n.get_octave();
-    vector<Note> nv = {k.scale_note(oct, 0), k.scale_note(oct, 2), k.scale_note(oct, 4)};
-    return Chord(nv, k); 
-}
-
-Chord minor_triad(Note n)
-{
-    Key k = n.to_key(MINOR);
+    Key k;
+    if (minor) { k = n.to_key(MINOR); }
+    else { k = n.to_key(MAJOR); }
     int oct = n.get_octave();
     vector<Note> nv = {k.scale_note(oct, 0), k.scale_note(oct, 2), k.scale_note(oct, 4)};
     return Chord(nv, k); 
