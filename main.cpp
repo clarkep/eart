@@ -32,24 +32,24 @@ vector<ChordQItem> gen1()
 
 int chord_quiz_basic()
 {
-	auto seed = 5001;
-	srand(seed);
-	NoteSynth *synth = new NoteSynth();
-	Quiz *quiz = new ListQuiz(synth, &triads_basic);
+    auto seed = 5001;
+    srand(seed);
+    NoteSynth *synth = new NoteSynth();
+    Quiz *quiz = new ListQuiz(synth, &triads_level2);
 
-	string resp;
-	cout << "Begin Quiz? [Y/n]: ";
-	getline(cin, resp);
-	int cont = (resp == "n") ? 0 : 1;
-	quiz->begin();
-	while (cont)
-	{
-		cont = quiz->next_round();
-	}
+    string resp;
+    cout << "Begin Quiz? [Y/n]: ";
+    getline(cin, resp);
+    int cont = (resp == "n") ? 0 : 1;
+    quiz->begin();
+    while (cont)
+    {
+            cont = quiz->next_round();
+    }
 }
 
 int main(int argc, char** argv)
 {
-	chord_quiz_basic();
-	//synth.play_note(Note(C_C, 4));
+    chord_quiz_basic();
+    //synth.play_note(Note(C_C, 4));
 }

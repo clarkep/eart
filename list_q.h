@@ -7,6 +7,7 @@
 #include "interface.h"
 
 std::vector<ChordQItem> triads_basic();
+std::vector<ChordQItem> triads_level2();
 
 
 #endif

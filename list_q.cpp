@@ -15,6 +15,10 @@ static int BASIC[5][4] = {{S_C, 0, 4, 0},
                          {S_G, 0, 4, 0},
                          {S_A, 0, 4, 1}};
 
+static  int LEVEL2[3][4] = {{S_D, 0, 4, 1},
+                            {S_G, 0, 4, 1},
+                            {S_B, -1, 4, 0}};
+
 std::vector<ChordQItem> triads_generator(int arr[][4], int len)
 {
     std::vector<ChordQItem> ret;
@@ -32,6 +36,14 @@ std::vector<ChordQItem> triads_generator(int arr[][4], int len)
 std::vector<ChordQItem> triads_basic()
 { 
     return triads_generator(BASIC, 5);
+}
+
+std::vector<ChordQItem> triads_level2()
+{
+    std::vector<ChordQItem> basic = triads_basic(); 
+    std::vector<ChordQItem> level2 = triads_generator(LEVEL2, 3);
+    level2.insert(level2.end(), basic.begin(), basic.end()); 
+    return level2;
 }
 
 /*

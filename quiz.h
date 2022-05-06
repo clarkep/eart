@@ -14,7 +14,7 @@
 
 using namespace std::string_literals;
 
-class ChordQItem 
+class ChordQItem
 {
 public:
     ChordQItem(Chord ch, std::string suf) : chord(ch), suffix(suf) {}
@@ -22,8 +22,8 @@ public:
     ChordQItem transpose(s_note intv) const;
     std::vector<Note> get_notevec() { return this->chord.notevec; }
     Key get_key() { return this->chord.key; } 
-    Chord chord;
     std::string suffix;
+    Chord chord;
 };
 
 class MultiQItem {
