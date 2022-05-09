@@ -14,16 +14,12 @@
 
 using namespace std::string_literals;
 
-class ChordQItem
+class ChordQItem : public Chord
 {
 public:
-    ChordQItem(Chord ch, std::string suf) : chord(ch), suffix(suf) {}
-    ChordQItem() : ChordQItem(Chord({}, Key("C"s)), ""s) {}
+    ChordQItem(std::vector<Note> nv, Key k, std::string suf): Chord(nv, k), suffix(suf){}
     ChordQItem transpose(s_note intv) const;
-    std::vector<Note> get_notevec() { return this->chord.notevec; }
-    Key get_key() { return this->chord.key; } 
     std::string suffix;
-    Chord chord;
 };
 
 class MultiQItem {

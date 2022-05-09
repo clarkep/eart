@@ -18,12 +18,11 @@
 
 using namespace std;
 
-
 ChordQItem ChordQItem::transpose(s_note intv) const
 {
-    Chord c = this->chord.transpose(intv);
-    return ChordQItem(c, suffix);
+    return ChordQItem(Chord(this->notevec, this->key).transpose(intv), this->suffix);
 }
+
 
 vector<ChordQItem> transpose_r(vector<ChordQItem> chords, int lower, int upper,
                                int min_sharps, int max_sharps)
@@ -48,7 +47,7 @@ int min_mn(vector<ChordQItem> chords)
 {
     int bottom = 10000;
     for(int i=0; i<chords.size(); i++) {
-        Note b = chords.at(i).chord.get_min();
+        Note b = chords.at(i).get_min();
         if (b.get_midi_n() < bottom) {
             bottom = b.get_midi_n();
         }
@@ -60,7 +59,7 @@ int max_mn(vector<ChordQItem> chords)
 {
     int top = -10000;
     for(int i=0; i<chords.size(); i++) {
-        Note t = chords.at(i).chord.get_max();
+        Note t = chords.at(i).get_max();
         if (t.get_midi_n() > top) {
             top = t.get_midi_n();
         }
@@ -71,7 +70,7 @@ int max_mn(vector<ChordQItem> chords)
 MultiQItem maj_root_movements()
 {
     vector<Note> cmaj{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4)};
-    ChordQItem orig = ChordQItem(Chord(cmaj, Key("C")), "");
+    ChordQItem orig = ChordQItem(cmaj, Key("C"), "");
     ChordQItem res1 = transpose_r({orig}, 40, 80, -6, 6).at(0);
     s_note intv = vec_rand_element(transpositions(-11, 11, -6, 6));
     ChordQItem res2 = res1.transpose(intv);
@@ -107,6 +106,6 @@ ChordQItem major_triad_quiz()
         }
         notes.push_back(n);
     }
-    ChordQItem ret(Chord(notes, Key("C")), "t");
+    ChordQItem ret(notes, Key("C"), "t");
     return ret;
 }

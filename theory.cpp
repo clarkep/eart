@@ -667,7 +667,8 @@ Chord triad(Note n, bool minor)
     else { k = n.to_key(MAJOR); }
     int oct = n.get_octave();
     vector<Note> nv = {k.scale_note(oct, 0), k.scale_note(oct, 2), k.scale_note(oct, 4)};
-    return Chord(nv, k); 
+    Chord ret(nv, k);
+    return ret; 
 }
 
 /* transpositions: generates all possible intervals by which to transpose a key

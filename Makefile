@@ -16,4 +16,4 @@ test : test.o $(objects)
 	g++ $(flags) -c -o $@ $< 
 
 clean:
-	rm eart test main.o test.o $(objects)
+	rm heart test main.o test.o $(objects)
