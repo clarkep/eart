@@ -18,7 +18,6 @@ class ChordQItem : public Chord
 {
 public:
     ChordQItem(std::vector<Note> nv, Key k, std::string suf): Chord(nv, k), suffix(suf){}
-    ChordQItem transpose(s_note intv) const;
     std::string suffix;
 };
 
@@ -37,11 +36,11 @@ I vec_rand_element(std::vector<I> v)
     return v.at(rand() % v.size());
 }
 
-std::vector<ChordQItem> transpose(std::vector<ChordQItem> chords, s_note intv);
-std::vector<ChordQItem> transpose_r(std::vector<ChordQItem> chords, int lower, int upper,
+std::vector<Chord*> transpose(std::vector<Chord*> chords, s_note intv);
+std::vector<Chord*> transpose_r(std::vector<Chord*> chords, int lower, int upper,
                                     int min_sharps, int max_sharps);
-int max_mn(std::vector<ChordQItem> chords);
-int min_mn(std::vector<ChordQItem> chords);
+int max_mn(std::vector<Chord*> chords);
+int min_mn(std::vector<Chord*> chords);
 
 
 

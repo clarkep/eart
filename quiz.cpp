@@ -18,13 +18,7 @@
 
 using namespace std;
 
-ChordQItem ChordQItem::transpose(s_note intv) const
-{
-    return ChordQItem(Chord(this->notevec, this->key).transpose(intv), this->suffix);
-}
-
-
-vector<ChordQItem> transpose_r(vector<ChordQItem> chords, int lower, int upper,
+vector<Chord*> transpose_r(vector<Chord*> chords, int lower, int upper,
                                int min_sharps, int max_sharps)
 {
     int uprange = upper - max_mn(chords);
@@ -34,20 +28,20 @@ vector<ChordQItem> transpose_r(vector<ChordQItem> chords, int lower, int upper,
     return transpose(chords, trans);
 }
 
-vector<ChordQItem> transpose(vector<ChordQItem> chords, s_note intv)
+vector<Chord*> transpose(vector<Chord*> chords, s_note intv)
 {
-    vector<ChordQItem> results;
+    vector<Chord*> results;
     for (int i=0; i<chords.size(); i++) {
-        results.push_back(chords.at(i).transpose(intv));
+        results.push_back(chords.at(i)->transpose(intv));
     }
     return results;
 }
 
-int min_mn(vector<ChordQItem> chords)
+int min_mn(vector<Chord*> chords)
 {
     int bottom = 10000;
     for(int i=0; i<chords.size(); i++) {
-        Note b = chords.at(i).get_min();
+        Note b = chords.at(i)->get_min();
         if (b.get_midi_n() < bottom) {
             bottom = b.get_midi_n();
         }
@@ -55,11 +49,11 @@ int min_mn(vector<ChordQItem> chords)
     return bottom;
 }
 
-int max_mn(vector<ChordQItem> chords)
+int max_mn(vector<Chord*> chords)
 {
     int top = -10000;
     for(int i=0; i<chords.size(); i++) {
-        Note t = chords.at(i).get_max();
+        Note t = chords.at(i)->get_max();
         if (t.get_midi_n() > top) {
             top = t.get_midi_n();
         }
@@ -67,15 +61,17 @@ int max_mn(vector<ChordQItem> chords)
     return top;
 }
 
+/*
 MultiQItem maj_root_movements()
 {
     vector<Note> cmaj{Note(C_C, 4), Note(C_E, 4), Note(C_G, 4)};
     ChordQItem orig = ChordQItem(cmaj, Key("C"), "");
-    ChordQItem res1 = transpose_r({orig}, 40, 80, -6, 6).at(0);
+    ChordQItem *res1 = &transpose_r({orig}, 40, 80, -6, 6).at(0);
     s_note intv = vec_rand_element(transpositions(-11, 11, -6, 6));
-    ChordQItem res2 = res1.transpose(intv);
+    res1->transpose(intv);
     return MultiQItem({res1, res2}, sintv_str(intv));
 }
+*/
 
 ChordQItem major_triad_quiz()
 {

@@ -98,8 +98,9 @@ ChordQItem ListQuiz::get_item()
    int i = rand() % this->qitems.size();
    return this->qitems.at(i);
 }
-
+/*
 MultiQItem RootMajMQuiz::get_item()
 {
     return maj_root_movements();
 }
+*/

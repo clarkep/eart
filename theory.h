@@ -231,7 +231,7 @@ private:
 class Chord {
 public:
     Chord(std::vector<Note> nv={}, Key k=Key("C")) : notevec(nv), key(k) {}
-    Chord transpose(s_note intv) const;
+    Chord* transpose(s_note intv);
     Note get_min() const;
     Note get_max() const;
     std::string to_string() const;

@@ -625,14 +625,15 @@ bool Note::operator>(const Note &Note2) const
     return this->get_midi_n() > Note2.get_midi_n();
 }
 
-Chord Chord::transpose(s_note intv) const
+Chord* Chord::transpose(s_note intv)
 {
     Key k = key.interval_key(intv, key.get_mode());
     vector<Note> nv;
     for(int i = 0; i<notevec.size(); i++) {
         nv.push_back(notevec.at(i).ktranspose(key, intv));
     }
-    return Chord(nv, k);
+    Chord *c = new Chord(nv, k);
+    return c;
 }
 
 Note Chord::get_min() const
