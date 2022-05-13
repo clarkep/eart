@@ -32,7 +32,7 @@ vector<ChordQItem> gen1()
 
 int chord_quiz_basic()
 {
-    auto seed = 5001;
+    auto seed = time(NULL); 
     srand(seed);
     NoteSynth *synth = new NoteSynth();
     Quiz *quiz = new ListQuiz(synth, &triads_level2);

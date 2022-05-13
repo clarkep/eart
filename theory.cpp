@@ -625,15 +625,13 @@ bool Note::operator>(const Note &Note2) const
     return this->get_midi_n() > Note2.get_midi_n();
 }
 
-Chord* Chord::transpose(s_note intv)
+void Chord::transpose(s_note intv)
 {
     Key k = key.interval_key(intv, key.get_mode());
-    vector<Note> nv;
+    key = k;
     for(int i = 0; i<notevec.size(); i++) {
-        nv.push_back(notevec.at(i).ktranspose(key, intv));
+        notevec[i] = notevec.at(i).ktranspose(key, intv);
     }
-    Chord *c = new Chord(nv, k);
-    return c;
 }
 
 Note Chord::get_min() const
@@ -661,14 +659,14 @@ string Chord::to_string() const
 
 
 
-Chord triad(Note n, bool minor)
+Chord* triad(Note n, bool minor)
 {
     Key k;
     if (minor) { k = n.to_key(MINOR); }
     else { k = n.to_key(MAJOR); }
     int oct = n.get_octave();
     vector<Note> nv = {k.scale_note(oct, 0), k.scale_note(oct, 2), k.scale_note(oct, 4)};
-    Chord ret(nv, k);
+    Chord *ret = new Chord(nv, k);
     return ret; 
 }
 

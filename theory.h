@@ -15,10 +15,7 @@
  * steps up the major scale and one chromatic shift downward.
  * To stay consistent, the comments use a similar terminology. What is usually
  * called a "major second" is here called a major first. A "perfect fifth" is
- * called a perfect fourth, and so on. An octave becomes a septave. This comment
- * is the only place you'll see the normal terminology. This new terminology is
- * what should have been used from the start in music, though, so I hope you get
- * used to it :).
+ * called a perfect fourth, and so on. 
  *
  */
 #ifndef __THEORY_H_INCLUDED__
@@ -231,7 +228,7 @@ private:
 class Chord {
 public:
     Chord(std::vector<Note> nv={}, Key k=Key("C")) : notevec(nv), key(k) {}
-    Chord* transpose(s_note intv);
+    virtual void transpose(s_note intv);
     Note get_min() const;
     Note get_max() const;
     std::string to_string() const;
@@ -240,7 +237,7 @@ public:
 };
 
 
-Chord triad(Note n, bool minor);
+Chord *triad(Note n, bool minor);
 
 
 /* transpositions: generates all possible intervals by which to transpose a key

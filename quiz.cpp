@@ -18,26 +18,26 @@
 
 using namespace std;
 
-vector<Chord*> transpose_r(vector<Chord*> chords, int lower, int upper,
+void transpose_r(vector<ChordQItem*> chords, int lower, int upper,
                                int min_sharps, int max_sharps)
 {
+    // cout << "Chord range" << min_mn(chords) << " " << max_mn(chords) << endl;
     int uprange = upper - max_mn(chords);
     int downrange = lower - min_mn(chords);
+    // cout << "Range: " << uprange << " " << downrange << endl;
     vector<s_note> trans_options = transpositions(downrange, uprange, min_sharps, max_sharps);
     s_note trans = trans_options.at(rand()%(trans_options.size()));
-    return transpose(chords, trans);
+    transpose(chords, trans);
 }
 
-vector<Chord*> transpose(vector<Chord*> chords, s_note intv)
+void transpose(vector<ChordQItem*> chords, s_note intv)
 {
-    vector<Chord*> results;
     for (int i=0; i<chords.size(); i++) {
-        results.push_back(chords.at(i)->transpose(intv));
+        chords.at(i)->transpose(intv);
     }
-    return results;
 }
 
-int min_mn(vector<Chord*> chords)
+int min_mn(vector<ChordQItem*> chords)
 {
     int bottom = 10000;
     for(int i=0; i<chords.size(); i++) {
@@ -49,7 +49,7 @@ int min_mn(vector<Chord*> chords)
     return bottom;
 }
 
-int max_mn(vector<Chord*> chords)
+int max_mn(vector<ChordQItem*> chords)
 {
     int top = -10000;
     for(int i=0; i<chords.size(); i++) {

@@ -6,8 +6,8 @@
 #include "quiz.h"
 #include "interface.h"
 
-std::vector<ChordQItem> triads_basic();
-std::vector<ChordQItem> triads_level2();
+std::vector<ChordQItem*> triads_basic();
+std::vector<ChordQItem*> triads_level2();
 
 
 #endif

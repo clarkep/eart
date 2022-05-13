@@ -43,13 +43,13 @@ protected:
 class ListQuiz: public SingleQuiz
 {
 public:
-    ListQuiz(NoteSynth *s, std::vector<ChordQItem> (*gen_list)());
+    ListQuiz(NoteSynth *s, std::vector<ChordQItem*> (*gen_list)());
     void begin();
 protected:
     ChordQItem get_item();
 private:
-    std::vector<ChordQItem> (*gen)();
-    std::vector<ChordQItem> qitems;
+    std::vector<ChordQItem*> (*gen)();
+    std::vector<ChordQItem*> qitems;
 };
 
 /*

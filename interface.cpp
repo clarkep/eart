@@ -82,7 +82,7 @@ int MultiQuiz::next_round()
     return (resp == "q") ? 0 : 1;
 }
 
-ListQuiz::ListQuiz(NoteSynth *s, std::vector<ChordQItem> (*gen_list)()) :
+ListQuiz::ListQuiz(NoteSynth *s, std::vector<ChordQItem*> (*gen_list)()) :
     SingleQuiz(s) 
 {
     this->gen = gen_list;
@@ -91,12 +91,19 @@ ListQuiz::ListQuiz(NoteSynth *s, std::vector<ChordQItem> (*gen_list)()) :
 void ListQuiz::begin()
 {
     qitems = (*(this->gen))();
+    ChordQItem *base = qitems[0];
+    cout << "Key = " << base->key.disp() << endl;
+    synth->play_chord(base->notevec);
+    cout << "Continue(enter) ";
+    string resp;
+    getline(cin, resp);
 }
 
 ChordQItem ListQuiz::get_item()
 {
    int i = rand() % this->qitems.size();
-   return this->qitems.at(i);
+   // cout << this->qitems.size() << endl; 
+   return *this->qitems.at(i);
 }
 /*
 MultiQItem RootMajMQuiz::get_item()
