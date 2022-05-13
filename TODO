@@ -1,0 +1,6 @@
+Add printing capabilities to Chord, Note
+Add debug mode with info messages
+Make List_q pick chords without repeats
+Complete CLI for List_q
+Add melodic list_q's 
+Add build system
