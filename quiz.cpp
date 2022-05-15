@@ -18,6 +18,7 @@
 
 using namespace std;
 
+
 void transpose_r(vector<ChordQItem*> chords, int lower, int upper,
                                int min_sharps, int max_sharps)
 {

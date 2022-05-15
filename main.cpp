@@ -4,10 +4,12 @@
 #include "file_q.h"
 #include "quiz.h"
 #include "list_q.h"
+#include "helpers.h"
 #include <string>
 #include <vector>
 #include <iostream>
 #include <ctime>
+#include <unistd.h>
 
 using namespace std;
 using namespace std::string_literals;
@@ -41,15 +43,32 @@ int chord_quiz_basic()
     cout << "Begin Quiz? [Y/n]: ";
     getline(cin, resp);
     int cont = (resp == "n") ? 0 : 1;
-    quiz->begin();
+    if (cont)
+        quiz->begin();
     while (cont)
-    {
-            cont = quiz->next_round();
-    }
+        cont = quiz->next_round();
 }
+
+bool verbose_flag=false;
 
 int main(int argc, char** argv)
 {
+    char c;
+    while ((c = getopt (argc, argv, "v")) != -1)
+    {
+        switch (c)
+        {
+        case 'v':
+            verbose_flag = true;
+            break;
+        case '?':
+            cout << "Unknown option.\n";
+            return 1;
+        }
+    }
+
+    print_verbose("Running in verbose mode.\n");
     chord_quiz_basic();
+    return 0;
     //synth.play_note(Note(C_C, 4));
 }

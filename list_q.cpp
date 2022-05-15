@@ -1,7 +1,12 @@
-#include "file_q.h"
+#include "list_q.h"
+#include "interface.h"
 #include "quiz.h"
 #include "synth1.h"
 #include "theory.h"
+#include "helpers.h"
+#include <random>
+#include <algorithm>
+#include <iterator>
 #include <vector>
 #include <string>
 #include <cstdlib>
@@ -21,12 +26,51 @@ static  int LEVEL2[3][4] = {{S_D, 0, 4, 1},
                             {S_B, -1, 4, 0}};
 
 
-void disp_vec(vector<ChordQItem*> v)
+ListQuiz::ListQuiz(NoteSynth *s, std::vector<ChordQItem*> (*gen_list)()) :
+    SingleQuiz(s) 
 {
-    for (int i = 0; i < v.size(); i++) {
-        cout << "(" << v.at(i)->key.disp() << ", " << v.at(i)->suffix << "), ";
+    this->gen = gen_list;
+}
+
+void ListQuiz::begin()
+{
+    qitems = (*(this->gen))();
+    ChordQItem *base = qitems[0];
+    shuffle_qitems();
+    cur_index = 0;
+
+    cout << "Key = " << base->key.disp() << endl;
+    synth->play_chord(base->notevec);
+    cout << "Continue(enter) ";
+    string resp;
+    getline(cin, resp);
+}
+
+ChordQItem ListQuiz::get_item()
+{
+    print_vec_verbose(qitems);
+    print_verbose("Cur index: ", cur_index, "\n");
+    if (cur_index < qitems.size()) {
+        return *qitems.at(cur_index++);
+    } else {
+        shuffle_qitems();
+        cur_index=0;
+        return *qitems.at(cur_index++);
     }
-    cout << endl;
+}
+
+void ListQuiz::shuffle_qitems()
+{
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    std::shuffle(qitems.begin(), qitems.end(), g);
+}
+
+ostream& operator<<(ostream& os, const ChordQItem& qitem)
+{
+    os << qitem.key.disp() << qitem.suffix; 
+    return os;
 }
 
 std::vector<ChordQItem*> triads_generator(int arr[][4], int len)
@@ -57,6 +101,6 @@ std::vector<ChordQItem*> triads_level2()
     std::vector<ChordQItem*> level2 = triads_generator(LEVEL2, 3);
     basic.insert(basic.end(), level2.begin(), level2.end()); 
     transpose_r(basic, 50, 80, -5, 6);
-    // disp_vec(basic);
+    print_vec_verbose(basic);
     return basic;
 }

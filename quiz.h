@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 
+using namespace std;
 using namespace std::string_literals;
 
 class ChordQItem : public Chord
@@ -20,6 +21,7 @@ public:
     ChordQItem(std::vector<Note> nv, Key k, std::string suf): Chord(nv, k), suffix(suf){}
     std::string suffix;
 };
+
 
 class MultiQItem {
 public:
