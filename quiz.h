@@ -19,6 +19,7 @@ class ChordQItem : public Chord
 {
 public:
     ChordQItem(std::vector<Note> nv, Key k, std::string suf): Chord(nv, k), suffix(suf){}
+    ChordQItem(): ChordQItem({}, Key("C"), ""s) {}
     std::string suffix;
 };
 

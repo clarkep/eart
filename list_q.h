@@ -26,6 +26,6 @@ ostream& operator<<(ostream& os, const ChordQItem& qitem);
 
 std::vector<ChordQItem*> triads_basic();
 std::vector<ChordQItem*> triads_level2();
-
+std::vector<ChordQItem*> triads_level3();
 
 #endif

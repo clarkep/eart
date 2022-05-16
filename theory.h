@@ -225,6 +225,8 @@ private:
     int octave;
 };
 
+std::ostream& operator<<(std::ostream& os, const Note& nt);
+
 class Chord {
 public:
     Chord(std::vector<Note> nv={}, Key k=Key("C")) : notevec(nv), key(k) {}
@@ -237,7 +239,7 @@ public:
 };
 
 
-Chord *triad(Note n, bool minor);
+Chord *triad(Note n, bool minor, int invert);
 
 
 /* transpositions: generates all possible intervals by which to transpose a key

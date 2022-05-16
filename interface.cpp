@@ -43,6 +43,7 @@ int SingleQuiz::next_round()
     if (resp == "q") {
         return 0;
     } else {
+        cout << endl;
         return 1;
     }
 }

@@ -37,7 +37,7 @@ int chord_quiz_basic()
     auto seed = time(NULL); 
     srand(seed);
     NoteSynth *synth = new NoteSynth();
-    Quiz *quiz = new ListQuiz(synth, &triads_level2);
+    Quiz *quiz = new ListQuiz(synth, &triads_level3);
 
     string resp;
     cout << "Begin Quiz? [Y/n]: ";

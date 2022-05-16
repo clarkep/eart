@@ -34,5 +34,16 @@ void print_vec_verbose(std::vector<T*> vec, const char *sep=", ")
     }
 }
 
+template <typename T>
+void print_vec_verbose(std::vector<T> vec, const char *sep=", ")
+{
+    if(verbose_flag) { 
+        int size = vec.size();
+        for(int i=0; i<size-1; ++i)
+            std::cout << (vec[i]) << sep;
+        std::cout << vec[size-1] << std::endl; 
+    }
+}
+
 
 #endif
