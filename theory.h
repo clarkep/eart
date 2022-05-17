@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#define FLAT_SHARP_LIMIT 7
+#define FLAT_SHARP_LIMIT 6
 #define MODAL 0
 
 /* seven-note (staff) note numbers */

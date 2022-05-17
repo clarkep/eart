@@ -40,10 +40,11 @@ void ListQuiz::begin()
     cur_index = 0;
 
     cout << "Key = " << base->key.disp() << endl;
-    synth->play_chord(base->notevec);
+    synth->chord_on(base->notevec);
     cout << "Continue(enter) ";
     string resp;
     getline(cin, resp);
+    synth->chord_off(base->notevec);
     cout << endl;
 }
 
@@ -95,7 +96,7 @@ std::vector<ChordQItem*> triads_generator(int arr[][4], int len, int max_invert=
 std::vector<ChordQItem*> triads_basic()
 { 
     std::vector<ChordQItem*> ret = triads_generator(BASIC, 5);
-    transpose_r(ret, 50, 80, -6, 6);
+    transpose_r(ret, 50, 80, -5, 6);
     return ret;
 }
 

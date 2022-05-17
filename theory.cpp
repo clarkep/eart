@@ -635,10 +635,10 @@ ostream& operator<<(ostream& os, const Note& nt)
 void Chord::transpose(s_note intv)
 {
     Key k = key.interval_key(intv, key.get_mode());
-    key = k;
     for(int i = 0; i<notevec.size(); i++) {
         notevec[i] = notevec.at(i).ktranspose(key, intv);
     }
+    key = k;
 }
 
 

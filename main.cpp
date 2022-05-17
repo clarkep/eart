@@ -6,10 +6,14 @@
 #include "list_q.h"
 #include "helpers.h"
 #include <string>
+#include <cstring>
 #include <vector>
 #include <iostream>
 #include <ctime>
 #include <unistd.h>
+
+#define DEFAULT_LEVEL 1
+#define MAX_LEVEL '3'
 
 using namespace std;
 using namespace std::string_literals;
@@ -32,12 +36,26 @@ vector<ChordQItem> gen1()
 }
 */
 
-int chord_quiz_basic()
+static std::vector<ChordQItem*> (*list_q_levels[])() = {&triads_basic, 
+    &triads_level2, &triads_level3};
+
+int process_level_arg(char *arg)
 {
-    auto seed = time(NULL); 
+    if (strlen(arg)==1 && arg[0]>='1' && arg[0]<=MAX_LEVEL) {
+        return arg[0] - '0'; 
+    } else {
+        fprintf(stderr, "Invalid level argument\n");
+        exit(1);
+    }
+}
+
+int chord_quiz_basic(int level)
+{
+    time_t seed = time(NULL);
+    print_verbose(seed, "\n");
     srand(seed);
     NoteSynth *synth = new NoteSynth();
-    Quiz *quiz = new ListQuiz(synth, &triads_level3);
+    Quiz *quiz = new ListQuiz(synth, list_q_levels[level-1]);
 
     string resp;
     cout << "Begin Quiz? [Y/n]: ";
@@ -54,12 +72,16 @@ bool verbose_flag=false;
 int main(int argc, char** argv)
 {
     char c;
-    while ((c = getopt (argc, argv, "v")) != -1)
+    int level = DEFAULT_LEVEL;
+    while ((c = getopt (argc, argv, "vl:")) != -1)
     {
         switch (c)
         {
         case 'v':
             verbose_flag = true;
+            break;
+        case 'l':
+            level = process_level_arg(optarg);
             break;
         case '?':
             cout << "Unknown option.\n";
@@ -68,7 +90,7 @@ int main(int argc, char** argv)
     }
 
     print_verbose("Running in verbose mode.\n");
-    chord_quiz_basic();
+    chord_quiz_basic(level);
     return 0;
     //synth.play_note(Note(C_C, 4));
 }
